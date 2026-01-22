@@ -1,3 +1,5 @@
+import './file_handlers.js';
+
 const editor = document.getElementById("editor");
 const fileInput = document.getElementById("file-input");
 const filenameInput = document.getElementById("filename-input");
@@ -86,3 +88,9 @@ document.addEventListener("keydown", (e) => {
     triggerLoad();
   }
 });
+
+// Expose these functions for on* HTML events
+window.triggerLoad = triggerLoad;
+window.saveFile = saveFile;
+window.loadFile = loadFile;
+window.readFile = readFile;
