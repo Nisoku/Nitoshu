@@ -114,9 +114,7 @@ export default defineConfig(({ mode }) => {
           ],
         },
         pwaAssets: {
-          image: "public/favicon.png",
-          preset: "minimal-2023",
-          includeHtmlHeadLinks: true,
+          config: true,
         },
         workbox: {
           // Required for PWA to find the inlined file
