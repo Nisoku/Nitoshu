@@ -1,17 +1,45 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nitoshu</title>
+    <link rel="stylesheet" href="./styles/styles.css" />
+  </head>
+  <body>
+    <div id="toolbar">
+      <button onclick="window.triggerLoad()">Open File</button>
+      <button onclick="window.saveFile()">Save File</button>
 
-<head>
-    <title>My Page</title>
-    <link rel="stylesheet" data-inline="true" href="./styles/styles.css" />
-</head>
+      <div class="filename-container">
+        <input
+          type="text"
+          id="filename-input"
+          value="Untitled.txt"
+          spellcheck="false"
+          title="Rename file here"
+        />
+      </div>
+    </div>
 
-<body>
-    <script type="module" data-inline="true" src="./src/main.js"></script>
-    <h1>Hello, world!</h1>
-    <p>This is a demo page.</p>
-    <button onclick="testFunction()">Click me!</button>
-    <button onclick="outputToPage()">Show a square.</button>
-</body>
+    <input type="file" id="file-input" onchange="window.loadFile(this)" />
 
+    <div id="editor-container">
+      <textarea
+        id="editor"
+        placeholder="Type here or drag and drop a file..."
+        spellcheck="false"
+      ></textarea>
+    </div>
+
+    <div id="status-bar">
+      <span id="char-count">0 characters</span>
+      <span>
+        <b>Nitoshu</b>
+      </span>
+      <span id="save-status">Ready</span>
+    </div>
+
+    <script src="./src/main.js"></script>
+  </body>
 </html>

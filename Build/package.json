@@ -1,5 +1,5 @@
 {
-  "name": "web-template",
+  "name": "nitoshu",
   "version": "0.1.0",
   "description": "My typical web dev starter project.",
   "main": "index.js",
@@ -12,14 +12,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/NellowTCS/Web-Template.git"
+    "url": "git+https://github.com/Nisoku/Nitoshu.git"
   },
   "author": "NellowTCS",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/NellowTCS/Web-Template/issues"
+    "url": "https://github.com/Nisoku/Nitoshu/issues"
   },
-  "homepage": "https://github.com/NellowTCS/Web-Template#readme",
+  "homepage": "https://github.com/Nisoku/Nitoshu#readme",
   "dependencies": {
     "vite": "^7.1.3"
   },
