@@ -21,7 +21,7 @@ export default defineConfig(({ mode }) => {
           background_color: "#ffffff",
           file_handlers: [
             {
-              action: "./",
+              action: "/Nitoshu/",
               accept: {
                 "text/*": [
                   ".txt",
