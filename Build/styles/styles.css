@@ -6,6 +6,7 @@
   --button-hover: #e6e6e6;
   --input-border: #cccccc;
   --input-focus: #007aff;
+  --drag-over-bg: #f9f9f9;
   --font-ui:
     -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial,
     sans-serif;
@@ -112,6 +113,11 @@ button:active {
   color: var(--text-color);
   white-space: pre;
   overflow-y: auto;
+  transition: background-color 0.1s;
+}
+
+#editor.drag-over {
+  background-color: var(--drag-over-bg);
 }
 
 #status-bar {
