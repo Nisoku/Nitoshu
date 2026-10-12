@@ -20,4 +20,7 @@ export interface EditorElements {
   readonly recentList: HTMLElement;
   readonly zenButton: HTMLButtonElement;
   readonly zenExitButton: HTMLButtonElement;
+  readonly commandPalette: HTMLElement;
+  readonly commandInput: HTMLInputElement;
+  readonly commandList: HTMLElement;
 }

@@ -59,5 +59,12 @@ export function getEditorElements(): EditorElements {
     recentList: htmlElement("recent-list"),
     zenButton: button("zen-button"),
     zenExitButton: button("zen-exit-button"),
+    commandPalette: htmlElement("command-palette"),
+    commandInput: getElement(
+      "command-input",
+      (element): element is HTMLInputElement =>
+        element instanceof HTMLInputElement,
+    ),
+    commandList: htmlElement("command-list"),
   };
 }

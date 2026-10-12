@@ -42,6 +42,23 @@ export function toggleZenMode(): void {
   zenMode.update((zen) => !zen);
 }
 
+export const commandPaletteOpen = signal<boolean>(
+  path("ui", "commandPaletteOpen"),
+  false,
+);
+
+export function openCommandPalette(): void {
+  commandPaletteOpen.set(true);
+}
+
+export function closeCommandPalette(): void {
+  commandPaletteOpen.set(false);
+}
+
+export function toggleCommandPalette(): void {
+  commandPaletteOpen.update((open) => !open);
+}
+
 export function toggleSettings(): void {
   settingsOpen.update((open) => !open);
 }

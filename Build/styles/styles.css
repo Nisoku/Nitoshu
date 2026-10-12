@@ -495,3 +495,104 @@ body.zen #status-bar {
 body.zen #zen-exit-button {
   display: flex;
 }
+
+#command-palette {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 12vh;
+}
+
+#command-palette[hidden] {
+  display: none;
+}
+
+.palette-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.25);
+}
+
+.palette {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: min(560px, calc(100vw - 32px));
+  max-height: 60vh;
+  background: var(--surface);
+  border: 1px solid var(--surface-border);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+#command-input {
+  border: none;
+  border-bottom: 1px solid var(--surface-border);
+  background: transparent;
+  color: var(--text-color);
+  padding: 14px 16px;
+  font-size: 14px;
+  font-family: var(--font-ui);
+  box-sizing: border-box;
+}
+
+#command-input:focus {
+  outline: none;
+}
+
+.command-list {
+  overflow-y: auto;
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.command-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+  border-radius: 6px;
+  padding: 9px 10px;
+  font-size: 13px;
+  color: var(--text-color);
+  text-align: left;
+  cursor: pointer;
+}
+
+.command-item.selected {
+  background: var(--accent);
+  color: #ffffff;
+}
+
+.command-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.command-hint {
+  color: var(--muted);
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.command-item.selected .command-hint {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.command-empty {
+  margin: 0;
+  padding: 12px;
+  font-size: 13px;
+  color: var(--muted);
+}

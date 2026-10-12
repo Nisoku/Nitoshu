@@ -111,6 +111,20 @@
       aria-label="Exit zen mode"
     ></button>
 
+    <div id="command-palette" hidden>
+      <div class="palette-backdrop"></div>
+      <div class="palette" role="dialog" aria-label="Command palette">
+        <input
+          type="text"
+          id="command-input"
+          placeholder="Type a command..."
+          spellcheck="false"
+          autocomplete="off"
+        />
+        <div id="command-list" class="command-list"></div>
+      </div>
+    </div>
+
     <script type="module" src="./src/main.ts"></script>
   </body>
 </html>
