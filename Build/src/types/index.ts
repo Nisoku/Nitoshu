@@ -7,4 +7,13 @@ export interface EditorElements {
   readonly filenameInput: HTMLInputElement;
   readonly charCount: HTMLElement;
   readonly saveStatus: HTMLElement;
+  readonly tabsContainer: HTMLElement;
+  readonly newTabButton: HTMLButtonElement;
+  readonly languageSelect: HTMLSelectElement;
+  readonly settingsButton: HTMLButtonElement;
+  readonly settingsPanel: HTMLElement;
+  readonly closeSettingsButton: HTMLButtonElement;
+  readonly themeSelect: HTMLSelectElement;
+  readonly indentSelect: HTMLSelectElement;
+  readonly recentList: HTMLElement;
 }

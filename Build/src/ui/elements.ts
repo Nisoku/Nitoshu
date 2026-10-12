@@ -1,26 +1,35 @@
 import type { EditorElements } from "../types";
 import { getElement } from "../utils/dom";
 
+function htmlElement(id: string): HTMLElement {
+  return getElement(
+    id,
+    (element): element is HTMLElement => element instanceof HTMLElement,
+  );
+}
+
+function button(id: string): HTMLButtonElement {
+  return getElement(
+    id,
+    (element): element is HTMLButtonElement =>
+      element instanceof HTMLButtonElement,
+  );
+}
+
+function select(id: string): HTMLSelectElement {
+  return getElement(
+    id,
+    (element): element is HTMLSelectElement =>
+      element instanceof HTMLSelectElement,
+  );
+}
+
 export function getEditorElements(): EditorElements {
   return {
-    editor: getElement(
-      "editor",
-      (element): element is HTMLElement => element instanceof HTMLElement,
-    ),
-    editorContainer: getElement(
-      "editor-container",
-      (element): element is HTMLElement => element instanceof HTMLElement,
-    ),
-    openButton: getElement(
-      "open-button",
-      (element): element is HTMLButtonElement =>
-        element instanceof HTMLButtonElement,
-    ),
-    saveButton: getElement(
-      "save-button",
-      (element): element is HTMLButtonElement =>
-        element instanceof HTMLButtonElement,
-    ),
+    editor: htmlElement("editor"),
+    editorContainer: htmlElement("editor-container"),
+    openButton: button("open-button"),
+    saveButton: button("save-button"),
     fileInput: getElement(
       "file-input",
       (element): element is HTMLInputElement =>
@@ -31,13 +40,16 @@ export function getEditorElements(): EditorElements {
       (element): element is HTMLInputElement =>
         element instanceof HTMLInputElement,
     ),
-    charCount: getElement(
-      "char-count",
-      (element): element is HTMLElement => element instanceof HTMLElement,
-    ),
-    saveStatus: getElement(
-      "save-status",
-      (element): element is HTMLElement => element instanceof HTMLElement,
-    ),
+    charCount: htmlElement("char-count"),
+    saveStatus: htmlElement("save-status"),
+    tabsContainer: htmlElement("tabs"),
+    newTabButton: button("new-tab-button"),
+    languageSelect: select("language-select"),
+    settingsButton: button("settings-button"),
+    settingsPanel: htmlElement("settings-panel"),
+    closeSettingsButton: button("settings-close"),
+    themeSelect: select("theme-select"),
+    indentSelect: select("indent-select"),
+    recentList: htmlElement("recent-list"),
   };
 }

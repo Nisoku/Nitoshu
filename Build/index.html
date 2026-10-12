@@ -20,6 +20,31 @@
           title="Rename file here"
         />
       </div>
+
+      <select id="language-select" title="Syntax highlighting">
+        <option value="">Auto</option>
+      </select>
+
+      <button
+        id="settings-button"
+        type="button"
+        title="Settings"
+        aria-label="Settings"
+      >
+        Settings
+      </button>
+    </div>
+
+    <div id="tab-bar">
+      <div id="tabs"></div>
+      <button
+        id="new-tab-button"
+        type="button"
+        title="New file"
+        aria-label="New file"
+      >
+        +
+      </button>
     </div>
 
     <input type="file" id="file-input" />
@@ -34,6 +59,35 @@
         <b>Nitoshu</b>
       </span>
       <span id="save-status">Ready</span>
+    </div>
+
+    <div id="settings-panel" hidden>
+      <div class="settings-header">
+        <h2>Settings</h2>
+        <button id="settings-close" type="button" aria-label="Close settings">
+          ×
+        </button>
+      </div>
+      <label class="settings-row">
+        <span>Theme</span>
+        <select id="theme-select">
+          <option value="system">System</option>
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+        </select>
+      </label>
+      <label class="settings-row">
+        <span>Indent</span>
+        <select id="indent-select">
+          <option value="2">2 spaces</option>
+          <option value="4">4 spaces</option>
+          <option value="tab">Tabs</option>
+        </select>
+      </label>
+      <div class="settings-section">
+        <h3>Recent files</h3>
+        <div id="recent-list" class="recent-list"></div>
+      </div>
     </div>
 
     <script type="module" src="./src/main.ts"></script>

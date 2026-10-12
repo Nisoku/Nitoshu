@@ -1,39 +1,96 @@
 import { bindEvent, effect } from "@nisoku/sairin";
-import { createEditor } from "./editor";
+import { createEditor, getLanguageOptions } from "./editor";
 import type { EditorAdapter } from "./editor";
 import {
   DEFAULT_FILENAME,
-  content,
-  filename,
-  flashStatus,
-  loadDocument,
-  markSaved,
-  setContent,
-  setStatus,
-} from "./state/app-state";
+  activeContent,
+  activeDocumentId,
+  activeFilename,
+  activeLanguage,
+  createDocument,
+  documentSummaries,
+  markActiveSaved,
+  openDocument,
+  setActiveContent,
+} from "./state/documents";
+import { flashStatus } from "./state/status";
+import { indentSetting } from "./state/settings";
+import { applyTheme, resolvedTheme } from "./features/theme";
 import { registerFileHandlers } from "./files/file-handlers";
 import { readFileAsText } from "./files/reader";
 import { saveTextToFile } from "./files/saver";
 import { registerShortcuts } from "./shortcuts";
+import {
+  loadDocuments,
+  loadRecent,
+  loadSettings,
+  watchDocuments,
+  watchRecent,
+  watchSettings,
+} from "./storage/persistence";
+import { recordRecent } from "./state/recent";
 import { getEditorElements } from "./ui/elements";
 import { bindStatusBar } from "./ui/bindings";
+import { bindSettingsPanel } from "./ui/settings-panel";
+import { mountTabBar } from "./ui/tabs";
 import { registerDragAndDrop } from "./ui/drag-drop";
 import type { EditorElements } from "./types";
+
+loadSettings();
+loadDocuments();
+loadRecent();
 
 const elements: EditorElements = getEditorElements();
 const editor: EditorAdapter = createEditor(elements.editor);
 
+for (const option of getLanguageOptions()) {
+  const element = document.createElement("option");
+  element.value = option.id;
+  element.textContent = option.label;
+  elements.languageSelect.append(element);
+}
+
+if (documentSummaries.peek().length === 0) {
+  createDocument();
+}
+
 bindStatusBar(elements);
+bindSettingsPanel(elements);
+mountTabBar(elements.tabsContainer);
+
+let lastDocumentId: string | null = null;
 
 effect(() => {
-  const value = content.get();
-  if (editor.getValue() !== value) {
+  const id = activeDocumentId.get();
+  const value = activeContent.get();
+  if (id !== lastDocumentId) {
+    lastDocumentId = id;
+    editor.setDocument(value);
+  } else if (editor.getValue() !== value) {
     editor.setValue(value);
   }
 });
 
 effect(() => {
-  editor.setLanguageFromFilename(filename.get());
+  editor.setLanguage(activeFilename.get(), activeLanguage.get());
+});
+
+effect(() => {
+  editor.setIndent(indentSetting.get());
+});
+
+effect(() => {
+  const theme = resolvedTheme.get();
+  applyTheme(theme);
+  editor.setTheme(theme);
+});
+
+watchSettings();
+watchDocuments();
+watchRecent();
+
+editor.onChange((value) => {
+  setActiveContent(value);
 });
 
 function triggerLoad(): void {
@@ -43,10 +100,11 @@ function triggerLoad(): void {
 async function openFile(file: File): Promise<void> {
   try {
     const value = await readFileAsText(file);
-    loadDocument(value, file.name);
-    setStatus(`Loaded: ${file.name}`);
+    openDocument(file.name, value);
+    recordRecent(file.name, value);
+    flashStatus(`Loaded: ${file.name}`);
   } catch (error) {
-    setStatus("Failed to open file");
+    flashStatus("Failed to open file", 4000);
     console.error(error);
   }
 }
@@ -62,8 +120,10 @@ function loadFile(input: HTMLInputElement): void {
 
 function saveFile(): void {
   const name = elements.filenameInput.value.trim() || DEFAULT_FILENAME;
-  saveTextToFile(editor.getValue(), name);
-  markSaved(name);
+  const content = editor.getValue();
+  saveTextToFile(content, name);
+  markActiveSaved(name);
+  recordRecent(name, content);
   flashStatus("Saved to Downloads");
 }
 
@@ -79,9 +139,9 @@ bindEvent(elements.fileInput, "change", () => {
   loadFile(elements.fileInput);
 });
 
-editor.onChange((value) => {
-  setContent(value);
-  setStatus("Unsaved changes");
+bindEvent(elements.newTabButton, "click", () => {
+  createDocument();
+  editor.focus();
 });
 
 registerDragAndDrop({
@@ -99,6 +159,9 @@ registerFileHandlers((file) => {
 registerShortcuts({
   onSave: saveFile,
   onOpen: triggerLoad,
+  onFind: () => {
+    editor.toggleSearch();
+  },
 });
 
 window.triggerLoad = triggerLoad;
