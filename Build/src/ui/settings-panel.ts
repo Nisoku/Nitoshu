@@ -1,15 +1,17 @@
 import { bindEvent, bindVisibility, effect } from "@nisoku/sairin";
 import type { EditorElements } from "../types";
-import { bindSelectValue } from "./bindings";
+import { bindCheckboxValue, bindSelectValue } from "./bindings";
 import {
   closeSettings,
   indentSetting,
   settingsOpen,
   themeSetting,
+  wordWrapSetting,
 } from "../state/settings";
 import { openDocument } from "../state/documents";
 import { recentFiles } from "../state/recent";
 import { flashStatus } from "../state/status";
+import { createIcon, icons } from "./icons";
 
 function mountRecentList(elements: EditorElements): void {
   effect(() => {
@@ -26,8 +28,11 @@ function mountRecentList(elements: EditorElements): void {
         const button = document.createElement("button");
         button.type = "button";
         button.className = "recent-item";
-        button.textContent = file.filename;
         button.title = file.filename;
+        const name = document.createElement("span");
+        name.className = "recent-name";
+        name.textContent = file.filename;
+        button.append(createIcon(icons.file, 14), name);
         button.addEventListener("click", () => {
           openDocument(file.filename, file.content);
           flashStatus(`Loaded: ${file.filename}`);
@@ -42,6 +47,7 @@ function mountRecentList(elements: EditorElements): void {
 export function bindSettingsPanel(elements: EditorElements): void {
   bindSelectValue(elements.themeSelect, themeSetting);
   bindSelectValue(elements.indentSelect, indentSetting);
+  bindCheckboxValue(elements.wordWrapToggle, wordWrapSetting);
   bindVisibility(elements.settingsPanel, settingsOpen);
   mountRecentList(elements);
 

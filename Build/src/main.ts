@@ -14,7 +14,13 @@ import {
   setActiveContent,
 } from "./state/documents";
 import { flashStatus } from "./state/status";
-import { indentSetting } from "./state/settings";
+import {
+  indentSetting,
+  setZenMode,
+  toggleZenMode,
+  wordWrapSetting,
+  zenMode,
+} from "./state/settings";
 import { applyTheme, resolvedTheme } from "./features/theme";
 import { registerFileHandlers } from "./files/file-handlers";
 import { readFileAsText } from "./files/reader";
@@ -33,6 +39,7 @@ import { getEditorElements } from "./ui/elements";
 import { bindStatusBar } from "./ui/bindings";
 import { bindSettingsPanel } from "./ui/settings-panel";
 import { mountTabBar } from "./ui/tabs";
+import { mountToolbarIcons } from "./ui/icons";
 import { registerDragAndDrop } from "./ui/drag-drop";
 import type { EditorElements } from "./types";
 
@@ -54,6 +61,7 @@ if (documentSummaries.peek().length === 0) {
   createDocument();
 }
 
+mountToolbarIcons(elements);
 bindStatusBar(elements);
 bindSettingsPanel(elements);
 mountTabBar(elements.tabsContainer);
@@ -77,6 +85,14 @@ effect(() => {
 
 effect(() => {
   editor.setIndent(indentSetting.get());
+});
+
+effect(() => {
+  editor.setWordWrap(wordWrapSetting.get());
+});
+
+effect(() => {
+  document.body.classList.toggle("zen", zenMode.get());
 });
 
 effect(() => {
@@ -142,6 +158,30 @@ bindEvent(elements.fileInput, "change", () => {
 bindEvent(elements.newTabButton, "click", () => {
   createDocument();
   editor.focus();
+});
+
+bindEvent(elements.searchButton, "click", () => {
+  editor.toggleSearch();
+});
+
+bindEvent(elements.zenButton, "click", () => {
+  toggleZenMode();
+  editor.focus();
+});
+
+bindEvent(elements.zenExitButton, "click", () => {
+  setZenMode(false);
+  editor.focus();
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key !== "Escape" || !zenMode.peek()) {
+    return;
+  }
+  if (document.querySelector(".cm-search") !== null) {
+    return;
+  }
+  setZenMode(false);
 });
 
 registerDragAndDrop({

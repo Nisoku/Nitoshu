@@ -45,11 +45,19 @@ export function getEditorElements(): EditorElements {
     tabsContainer: htmlElement("tabs"),
     newTabButton: button("new-tab-button"),
     languageSelect: select("language-select"),
+    searchButton: button("search-button"),
     settingsButton: button("settings-button"),
     settingsPanel: htmlElement("settings-panel"),
     closeSettingsButton: button("settings-close"),
     themeSelect: select("theme-select"),
     indentSelect: select("indent-select"),
+    wordWrapToggle: getElement(
+      "word-wrap-toggle",
+      (element): element is HTMLInputElement =>
+        element instanceof HTMLInputElement,
+    ),
     recentList: htmlElement("recent-list"),
+    zenButton: button("zen-button"),
+    zenExitButton: button("zen-exit-button"),
   };
 }

@@ -25,6 +25,7 @@
   --muted: #86868b;
   --accent: #007aff;
   --shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
+  --control-height: 30px;
   --font-ui:
     -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial,
     sans-serif;
@@ -82,6 +83,25 @@ body {
   user-select: none;
 }
 
+#toolbar button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+#toolbar button,
+#toolbar select,
+#filename-input {
+  height: var(--control-height);
+  box-sizing: border-box;
+}
+
+.icon {
+  display: block;
+  flex: none;
+}
+
 button {
   background: var(--button-bg);
   border: 1px solid var(--button-border);
@@ -122,6 +142,12 @@ select:focus {
 
 #language-select {
   max-width: 150px;
+}
+
+#search-button {
+  width: var(--control-height);
+  padding: 0;
+  flex: none;
 }
 
 .filename-container {
@@ -214,6 +240,8 @@ select:focus {
 
 .tab-close {
   display: none;
+  align-items: center;
+  justify-content: center;
   border: none;
   background: transparent;
   color: var(--muted);
@@ -226,7 +254,7 @@ select:focus {
 
 .tab:hover .tab-close,
 .tab.active .tab-close {
-  display: inline;
+  display: inline-flex;
 }
 
 .tab.dirty:hover .tab-dirty {
@@ -239,6 +267,9 @@ select:focus {
 }
 
 #new-tab-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border: none;
   border-left: 1px solid var(--toolbar-border);
   border-radius: 0;
@@ -344,6 +375,9 @@ select:focus {
 }
 
 #settings-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   border: none;
   background: transparent;
   color: var(--muted);
@@ -394,6 +428,9 @@ select:focus {
 }
 
 .recent-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   text-align: left;
   border: none;
   background: transparent;
@@ -402,9 +439,12 @@ select:focus {
   padding: 6px 8px;
   font-size: 12px;
   color: var(--text-color);
+  white-space: nowrap;
+}
+
+.recent-name {
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .recent-item:hover {
@@ -415,4 +455,43 @@ select:focus {
   margin: 0;
   font-size: 12px;
   color: var(--muted);
+}
+
+#word-wrap-toggle {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+body.zen #toolbar,
+body.zen #status-bar {
+  display: none;
+}
+
+#zen-exit-button {
+  display: none;
+  position: fixed;
+  bottom: 16px;
+  right: 16px;
+  z-index: 30;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border-radius: 50%;
+  font-size: 18px;
+  line-height: 1;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.5;
+  box-shadow: var(--shadow);
+}
+
+#zen-exit-button:hover {
+  opacity: 1;
+}
+
+body.zen #zen-exit-button {
+  display: flex;
 }

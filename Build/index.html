@@ -10,6 +10,9 @@
     <div id="toolbar">
       <button id="open-button" type="button">Open File</button>
       <button id="save-button" type="button">Save File</button>
+      <button id="zen-button" type="button" title="Toggle zen mode">
+        Zen
+      </button>
 
       <div class="filename-container">
         <input
@@ -20,6 +23,13 @@
           title="Rename file here"
         />
       </div>
+
+      <button
+        id="search-button"
+        type="button"
+        title="Find and replace (Ctrl+F)"
+        aria-label="Find and replace"
+      ></button>
 
       <select id="language-select" title="Syntax highlighting">
         <option value="">Auto</option>
@@ -42,9 +52,7 @@
         type="button"
         title="New file"
         aria-label="New file"
-      >
-        +
-      </button>
+      ></button>
     </div>
 
     <input type="file" id="file-input" />
@@ -64,9 +72,11 @@
     <div id="settings-panel" hidden>
       <div class="settings-header">
         <h2>Settings</h2>
-        <button id="settings-close" type="button" aria-label="Close settings">
-          ×
-        </button>
+        <button
+          id="settings-close"
+          type="button"
+          aria-label="Close settings"
+        ></button>
       </div>
       <label class="settings-row">
         <span>Theme</span>
@@ -84,11 +94,22 @@
           <option value="tab">Tabs</option>
         </select>
       </label>
+      <label class="settings-row">
+        <span>Word wrap</span>
+        <input type="checkbox" id="word-wrap-toggle" />
+      </label>
       <div class="settings-section">
         <h3>Recent files</h3>
         <div id="recent-list" class="recent-list"></div>
       </div>
     </div>
+
+    <button
+      id="zen-exit-button"
+      type="button"
+      title="Exit zen mode (Esc)"
+      aria-label="Exit zen mode"
+    ></button>
 
     <script type="module" src="./src/main.ts"></script>
   </body>

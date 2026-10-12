@@ -6,6 +6,7 @@ import {
   documentSummaries,
   setActiveDocument,
 } from "../state/documents";
+import { createIcon, icons } from "./icons";
 
 function renderTab(summary: DocumentSummary, activeId: string): HTMLElement {
   const tab = document.createElement("div");
@@ -37,8 +38,8 @@ function renderTab(summary: DocumentSummary, activeId: string): HTMLElement {
   const close = document.createElement("button");
   close.type = "button";
   close.className = "tab-close";
-  close.textContent = "×";
   close.title = "Close";
+  close.append(createIcon(icons.close, 14));
   close.addEventListener("click", (event) => {
     event.stopPropagation();
     closeDocument(summary.id);

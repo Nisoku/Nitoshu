@@ -1,9 +1,4 @@
-import {
-  bindEvent,
-  bindProperty,
-  bindText,
-  type Signal,
-} from "@nisoku/sairin";
+import { bindEvent, bindProperty, bindText, type Signal } from "@nisoku/sairin";
 import type { EditorElements } from "../types";
 import { status } from "../state/status";
 import {
@@ -21,6 +16,20 @@ export function bindSelectValue<T extends string>(
   const disposeProperty = bindProperty(select, "value", signal);
   const disposeChange = bindEvent(select, "change", () => {
     signal.set(select.value as T);
+  });
+  return () => {
+    disposeProperty();
+    disposeChange();
+  };
+}
+
+export function bindCheckboxValue(
+  input: HTMLInputElement,
+  target: Signal<boolean>,
+): () => void {
+  const disposeProperty = bindProperty(input, "checked", target);
+  const disposeChange = bindEvent(input, "change", () => {
+    target.set(input.checked);
   });
   return () => {
     disposeProperty();

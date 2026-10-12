@@ -63,12 +63,14 @@ export class CodeMirrorEditor implements EditorAdapter {
   private readonly languageCompartment = new Compartment();
   private readonly themeCompartment = new Compartment();
   private readonly indentCompartment = new Compartment();
+  private readonly wrapCompartment = new Compartment();
 
   private suppressChange = false;
   private languageToken = 0;
   private currentSupport: LanguageSupport | null = null;
   private currentTheme: EditorTheme = "light";
   private currentIndent: IndentSetting = "2";
+  private currentWordWrap = false;
 
   constructor(container: HTMLElement) {
     this.view = new EditorView({
@@ -107,6 +109,9 @@ export class CodeMirrorEditor implements EditorAdapter {
         this.currentTheme === "dark" ? darkEditorTheme : [],
       ),
       this.indentCompartment.of(this.indentConfig(this.currentIndent)),
+      this.wrapCompartment.of(
+        this.currentWordWrap ? EditorView.lineWrapping : [],
+      ),
       keymap.of([
         ...closeBracketsKeymap,
         ...defaultKeymap,
@@ -201,7 +206,19 @@ export class CodeMirrorEditor implements EditorAdapter {
   setIndent(indent: IndentSetting): void {
     this.currentIndent = indent;
     this.view.dispatch({
-      effects: this.indentCompartment.reconfigure(this.indentConfig(indent)),
+      effects:       this.indentCompartment.reconfigure(this.indentConfig(indent)),
+    });
+  }
+
+  setWordWrap(enabled: boolean): void {
+    if (enabled === this.currentWordWrap) {
+      return;
+    }
+    this.currentWordWrap = enabled;
+    this.view.dispatch({
+      effects: this.wrapCompartment.reconfigure(
+        enabled ? EditorView.lineWrapping : [],
+      ),
     });
   }
 

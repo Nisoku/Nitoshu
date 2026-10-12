@@ -15,4 +15,5 @@ export interface EditorAdapter {
   setLanguage(filename: string, languageId: string): void;
   setTheme(theme: EditorTheme): void;
   setIndent(indent: IndentSetting): void;
+  setWordWrap(enabled: boolean): void;
 }
