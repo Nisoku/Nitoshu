@@ -2,6 +2,7 @@ import {
   Download,
   FileText,
   FolderOpen,
+  FolderTree,
   Maximize2,
   Minimize2,
   Plus,
@@ -15,6 +16,7 @@ import type { EditorElements } from "../types";
 
 export const icons = {
   open: FolderOpen,
+  folder: FolderTree,
   save: Download,
   search: Search,
   settings: Settings,
@@ -42,6 +44,7 @@ export function setIcon(target: Element, node: IconNode, size = 16): void {
 export function mountToolbarIcons(elements: EditorElements): void {
   elements.openButton.prepend(createIcon(icons.open));
   elements.saveButton.prepend(createIcon(icons.save));
+  elements.folderButton.prepend(createIcon(icons.folder));
   elements.zenButton.prepend(createIcon(icons.zen));
   elements.settingsButton.prepend(createIcon(icons.settings));
   setIcon(elements.searchButton, icons.search);

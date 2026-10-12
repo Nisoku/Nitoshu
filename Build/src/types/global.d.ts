@@ -15,6 +15,7 @@ declare global {
   interface Window {
     launchQueue?: LaunchQueue;
     triggerLoad: () => void;
+    openFolder: () => Promise<void>;
     saveFile: () => void;
     loadFile: (input: HTMLInputElement) => void;
     readFile: (file: File) => void;

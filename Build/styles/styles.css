@@ -338,7 +338,8 @@ select:focus {
   background: var(--status-bg);
 }
 
-#file-input {
+#file-input,
+#folder-input {
   display: none;
 }
 

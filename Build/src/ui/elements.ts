@@ -30,8 +30,14 @@ export function getEditorElements(): EditorElements {
     editorContainer: htmlElement("editor-container"),
     openButton: button("open-button"),
     saveButton: button("save-button"),
+    folderButton: button("folder-button"),
     fileInput: getElement(
       "file-input",
+      (element): element is HTMLInputElement =>
+        element instanceof HTMLInputElement,
+    ),
+    folderInput: getElement(
+      "folder-input",
       (element): element is HTMLInputElement =>
         element instanceof HTMLInputElement,
     ),

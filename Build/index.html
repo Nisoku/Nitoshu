@@ -10,6 +10,9 @@
     <div id="toolbar">
       <button id="open-button" type="button">Open File</button>
       <button id="save-button" type="button">Save File</button>
+      <button id="folder-button" type="button" title="Open folder (Ctrl+Shift+O)">
+        Folder
+      </button>
       <button id="zen-button" type="button" title="Toggle zen mode">
         Zen
       </button>
@@ -56,6 +59,7 @@
     </div>
 
     <input type="file" id="file-input" />
+    <input type="file" id="folder-input" webkitdirectory multiple />
 
     <div id="editor-container">
       <div id="editor"></div>

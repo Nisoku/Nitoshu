@@ -22,12 +22,22 @@ export interface DocumentsSnapshot {
   readonly activeIndex: number;
 }
 
+export type DocumentSource =
+  | {
+      readonly kind: "fs-access";
+      readonly handle: FileSystemFileHandle;
+      readonly relPath: string;
+    }
+  | { readonly kind: "webkit"; readonly relPath: string };
+
 interface DocumentRecord {
   readonly content: Signal<string>;
   readonly filename: Signal<string>;
   readonly dirty: Signal<boolean>;
   /** Empty string means "auto-detect from the filename". */
   readonly language: Signal<string>;
+  /** In-memory edit-in-place source; never persisted across sessions. */
+  readonly source: Signal<DocumentSource | null>;
 }
 
 const records = new Map<string, DocumentRecord>();
@@ -47,6 +57,10 @@ function getRecord(id: string): DocumentRecord {
       ),
       dirty: signal<boolean>(path("documents", id, "dirty"), false),
       language: signal<string>(path("documents", id, "language"), ""),
+      source: signal<DocumentSource | null>(
+        path("documents", id, "source"),
+        null,
+      ),
     };
     records.set(id, record);
   }
@@ -122,6 +136,7 @@ function isReusable(id: string): boolean {
 export function createDocument(
   filename: string = DEFAULT_FILENAME,
   content = "",
+  source: DocumentSource | null = null,
 ): string {
   const id = `doc-${++idCounter}`;
   const record = getRecord(id);
@@ -130,19 +145,26 @@ export function createDocument(
     record.content.set(content);
     record.dirty.set(false);
     record.language.set("");
+    record.source.set(source);
     order.set([...order.get(), id]);
     activeId.set(id);
   });
   return id;
 }
 
-function loadInto(id: string, filename: string, content: string): void {
+function loadInto(
+  id: string,
+  filename: string,
+  content: string,
+  source: DocumentSource | null = null,
+): void {
   const record = getRecord(id);
   batch(() => {
     record.content.set(content);
     record.filename.set(filename);
     record.dirty.set(false);
     record.language.set("");
+    record.source.set(source);
   });
 }
 
@@ -156,12 +178,16 @@ function findDocumentIdByFilename(filename: string): string | null {
   return null;
 }
 
-export function openDocument(filename: string, content: string): string {
+export function openDocument(
+  filename: string,
+  content: string,
+  source: DocumentSource | null = null,
+): string {
   // Already open? Focus the existing tab instead of creating a duplicate.
   const existing = findDocumentIdByFilename(filename);
   if (existing !== null) {
     if (isReusable(existing)) {
-      loadInto(existing, filename, content);
+      loadInto(existing, filename, content, source);
     }
     activeId.set(existing);
     return existing;
@@ -169,11 +195,11 @@ export function openDocument(filename: string, content: string): string {
 
   const id = activeId.get();
   if (id !== "" && isReusable(id)) {
-    loadInto(id, filename, content);
+    loadInto(id, filename, content, source);
     return id;
   }
 
-  return createDocument(filename, content);
+  return createDocument(filename, content, source);
 }
 
 export function closeDocument(id: string): void {
@@ -238,6 +264,11 @@ export function markActiveSaved(filename: string): void {
     record.filename.set(filename);
     record.dirty.set(false);
   });
+}
+
+export function getActiveSource(): DocumentSource | null {
+  const id = activeId.get();
+  return id === "" ? null : getRecord(id).source.get();
 }
 
 export function snapshotDocuments(): DocumentsSnapshot {

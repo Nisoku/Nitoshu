@@ -3,7 +3,9 @@ export interface EditorElements {
   readonly editorContainer: HTMLElement;
   readonly openButton: HTMLButtonElement;
   readonly saveButton: HTMLButtonElement;
+  readonly folderButton: HTMLButtonElement;
   readonly fileInput: HTMLInputElement;
+  readonly folderInput: HTMLInputElement;
   readonly filenameInput: HTMLInputElement;
   readonly charCount: HTMLElement;
   readonly saveStatus: HTMLElement;

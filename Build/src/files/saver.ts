@@ -13,3 +13,15 @@ export function saveTextToFile(content: string, filename: string): void {
     URL.revokeObjectURL(url);
   }, 100);
 }
+
+export async function writeToFileHandle(
+  handle: FileSystemFileHandle,
+  content: string,
+): Promise<void> {
+  const writable = await handle.createWritable();
+  try {
+    await writable.write(content);
+  } finally {
+    await writable.close();
+  }
+}

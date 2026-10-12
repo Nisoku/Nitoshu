@@ -1,6 +1,7 @@
 [
   { "id": "new-file", "label": "New File" },
   { "id": "open-file", "label": "Open File...", "shortcut": { "key": "o", "mod": true } },
+  { "id": "open-folder", "label": "Open Folder...", "shortcut": { "key": "o", "mod": true, "shift": true } },
   { "id": "save-file", "label": "Save File", "shortcut": { "key": "s", "mod": true } },
   { "id": "find", "label": "Find / Replace", "shortcut": { "key": "f", "mod": true } },
   { "id": "palette", "label": "Command Palette", "shortcut": { "key": "k", "mod": true } },

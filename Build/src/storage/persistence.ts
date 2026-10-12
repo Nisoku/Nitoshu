@@ -14,25 +14,28 @@ import {
   recentFiles,
   type RecentFile,
 } from "../state/recent";
-import { readJson, writeJson } from "./local";
+import { readJson, writeJson } from "./backend";
 
 const SETTINGS_KEY = "settings";
 const DOCUMENTS_KEY = "documents";
 const RECENT_KEY = "recent";
 const DOCUMENTS_DEBOUNCE_MS = 400;
 
-export function loadSettings(): void {
-  applySettings(readJson<Partial<Settings>>(SETTINGS_KEY, {}));
+export async function loadSettings(): Promise<void> {
+  applySettings(await readJson<Partial<Settings>>(SETTINGS_KEY, {}));
 }
 
 export function watchSettings(): () => void {
   return effect(() => {
-    writeJson(SETTINGS_KEY, snapshotSettings());
+    void writeJson(SETTINGS_KEY, snapshotSettings());
   });
 }
 
-export function loadDocuments(): void {
-  const snapshot = readJson<DocumentsSnapshot | null>(DOCUMENTS_KEY, null);
+export async function loadDocuments(): Promise<void> {
+  const snapshot = await readJson<DocumentsSnapshot | null>(
+    DOCUMENTS_KEY,
+    null,
+  );
   if (snapshot !== null && Array.isArray(snapshot.documents)) {
     restoreDocuments(snapshot);
   }
@@ -47,13 +50,13 @@ export function watchDocuments(): () => void {
     }
     timer = window.setTimeout(() => {
       timer = undefined;
-      writeJson(DOCUMENTS_KEY, snapshot);
+      void writeJson(DOCUMENTS_KEY, snapshot);
     }, DOCUMENTS_DEBOUNCE_MS);
   });
 }
 
-export function loadRecent(): void {
-  const files = readJson<RecentFile[]>(RECENT_KEY, []);
+export async function loadRecent(): Promise<void> {
+  const files = await readJson<RecentFile[]>(RECENT_KEY, []);
   if (Array.isArray(files)) {
     restoreRecent(files);
   }
@@ -61,6 +64,6 @@ export function loadRecent(): void {
 
 export function watchRecent(): () => void {
   return effect(() => {
-    writeJson(RECENT_KEY, recentFiles.get());
+    void writeJson(RECENT_KEY, recentFiles.get());
   });
 }
