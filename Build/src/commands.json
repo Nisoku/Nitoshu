@@ -1,0 +1,18 @@
+[
+  { "id": "new-file", "label": "New File" },
+  { "id": "open-file", "label": "Open File...", "shortcut": { "key": "o", "mod": true } },
+  { "id": "open-folder", "label": "Open Folder...", "shortcut": { "key": "o", "mod": true, "shift": true } },
+  { "id": "save-file", "label": "Save File", "shortcut": { "key": "s", "mod": true } },
+  { "id": "find", "label": "Find / Replace", "shortcut": { "key": "f", "mod": true } },
+  { "id": "palette", "label": "Command Palette", "shortcut": { "key": "k", "mod": true } },
+  { "id": "close-tab", "label": "Close Tab" },
+  { "id": "word-wrap", "label": "Toggle Word Wrap" },
+  { "id": "zen", "label": "Toggle Zen Mode" },
+  { "id": "theme-system", "label": "Theme: System" },
+  { "id": "theme-light", "label": "Theme: Light" },
+  { "id": "theme-dark", "label": "Theme: Dark" },
+  { "id": "indent-2", "label": "Indent: 2 spaces" },
+  { "id": "indent-4", "label": "Indent: 4 spaces" },
+  { "id": "indent-tab", "label": "Indent: Tabs" },
+  { "id": "settings", "label": "Toggle Settings" }
+]

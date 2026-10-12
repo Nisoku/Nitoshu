@@ -8,8 +8,14 @@
   </head>
   <body>
     <div id="toolbar">
-      <button onclick="window.triggerLoad()">Open File</button>
-      <button onclick="window.saveFile()">Save File</button>
+      <button id="open-button" type="button">Open File</button>
+      <button id="save-button" type="button">Save File</button>
+      <button id="folder-button" type="button" title="Open folder (Ctrl+Shift+O)">
+        Folder
+      </button>
+      <button id="zen-button" type="button" title="Toggle zen mode">
+        Zen
+      </button>
 
       <div class="filename-container">
         <input
@@ -20,16 +26,43 @@
           title="Rename file here"
         />
       </div>
+
+      <button
+        id="search-button"
+        type="button"
+        title="Find and replace (Ctrl+F)"
+        aria-label="Find and replace"
+      ></button>
+
+      <select id="language-select" title="Syntax highlighting">
+        <option value="">Auto</option>
+      </select>
+
+      <button
+        id="settings-button"
+        type="button"
+        title="Settings"
+        aria-label="Settings"
+      >
+        Settings
+      </button>
     </div>
 
-    <input type="file" id="file-input" onchange="window.loadFile(this)" />
+    <div id="tab-bar">
+      <div id="tabs"></div>
+      <button
+        id="new-tab-button"
+        type="button"
+        title="New file"
+        aria-label="New file"
+      ></button>
+    </div>
+
+    <input type="file" id="file-input" />
+    <input type="file" id="folder-input" webkitdirectory multiple />
 
     <div id="editor-container">
-      <textarea
-        id="editor"
-        placeholder="Type here or drag and drop a file..."
-        spellcheck="false"
-      ></textarea>
+      <div id="editor"></div>
     </div>
 
     <div id="status-bar">
@@ -40,6 +73,62 @@
       <span id="save-status">Ready</span>
     </div>
 
-    <script type="module" src="./src/main.js"></script>
+    <div id="settings-panel" hidden>
+      <div class="settings-header">
+        <h2>Settings</h2>
+        <button
+          id="settings-close"
+          type="button"
+          aria-label="Close settings"
+        ></button>
+      </div>
+      <label class="settings-row">
+        <span>Theme</span>
+        <select id="theme-select">
+          <option value="system">System</option>
+          <option value="light">Light</option>
+          <option value="dark">Dark</option>
+        </select>
+      </label>
+      <label class="settings-row">
+        <span>Indent</span>
+        <select id="indent-select">
+          <option value="2">2 spaces</option>
+          <option value="4">4 spaces</option>
+          <option value="tab">Tabs</option>
+        </select>
+      </label>
+      <label class="settings-row">
+        <span>Word wrap</span>
+        <input type="checkbox" id="word-wrap-toggle" />
+      </label>
+      <div class="settings-section">
+        <h3>Recent files</h3>
+        <div id="recent-list" class="recent-list"></div>
+      </div>
+    </div>
+
+    <button
+      id="zen-exit-button"
+      type="button"
+      title="Exit zen mode (Esc)"
+      aria-label="Exit zen mode"
+    ></button>
+
+    <div id="command-palette" hidden>
+      <div class="palette-backdrop"></div>
+      <div class="palette" role="dialog" aria-label="Command palette">
+        <input
+          type="text"
+          id="command-input"
+          placeholder="Type a command..."
+          spellcheck="false"
+          autocomplete="off"
+        />
+        <div id="command-list" class="command-list"></div>
+      </div>
+    </div>
+
+    <script type="module" src="./src/main.ts"></script>
   </body>
 </html>

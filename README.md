@@ -27,7 +27,7 @@ Japanese is so cool :D
 - Clean, responsive UI (try it on mobile, too)
 - [PWA](https://web.dev/progressive-web-apps/) support (installable, offline-friendly)
 - Supports a huge array of text/code file extensions via the manifest
-- No dependencies except [Vite](https://vitejs.dev/) (for building) and minimal plugins
+- Written in strict TypeScript, with minimal runtime dependencies
 
 ---
 
@@ -68,9 +68,11 @@ Just open the latest [single-file](https://github.com/Nisoku/Nitoshu/actions/wor
 ## Tech Stack
 
 - [Vite](https://vitejs.dev/) build tool
+- [TypeScript](https://www.typescriptlang.org/) (strict mode)
+- [CodeMirror 6](https://codemirror.net/) editor core
+- [`@nisoku/sairin`](https://nisoku.org/Sairin/) for reactive app/file/UI state
 - [vite-plugin-pwa](https://vite-pwa-org.netlify.app/)
 - [vite-plugin-singlefile](https://github.com/saf33r/vite-plugin-singlefile) (for a single, portable HTML build)
-- Zero external JS dependencies in the app code itself
 
 ---
 
