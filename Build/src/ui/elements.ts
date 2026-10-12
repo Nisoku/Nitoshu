@@ -5,8 +5,7 @@ export function getEditorElements(): EditorElements {
   return {
     editor: getElement(
       "editor",
-      (element): element is HTMLTextAreaElement =>
-        element instanceof HTMLTextAreaElement,
+      (element): element is HTMLElement => element instanceof HTMLElement,
     ),
     editorContainer: getElement(
       "editor-container",

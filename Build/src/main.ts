@@ -4,6 +4,7 @@ import type { EditorAdapter } from "./editor";
 import {
   DEFAULT_FILENAME,
   content,
+  filename,
   flashStatus,
   loadDocument,
   markSaved,
@@ -29,6 +30,10 @@ effect(() => {
   if (editor.getValue() !== value) {
     editor.setValue(value);
   }
+});
+
+effect(() => {
+  editor.setLanguageFromFilename(filename.get());
 });
 
 function triggerLoad(): void {

@@ -3,4 +3,5 @@ export interface EditorAdapter {
   setValue(value: string): void;
   focus(): void;
   onChange(listener: (value: string) => void): () => void;
+  setLanguageFromFilename(filename: string): void;
 }

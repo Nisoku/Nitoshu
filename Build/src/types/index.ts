@@ -1,5 +1,5 @@
 export interface EditorElements {
-  readonly editor: HTMLTextAreaElement;
+  readonly editor: HTMLElement;
   readonly editorContainer: HTMLElement;
   readonly openButton: HTMLButtonElement;
   readonly saveButton: HTMLButtonElement;

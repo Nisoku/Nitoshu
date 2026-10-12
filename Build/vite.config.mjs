@@ -6,11 +6,8 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
   const isSingleFile = env.SINGLE_FILE === "true";
 
-  return {
-    base: "./",
-    plugins: [
-      VitePWA({
-        registerType: "autoUpdate",
+  const pwaPlugin = VitePWA({
+    registerType: "autoUpdate",
         includeAssets: ["robots.txt"],
         manifest: {
           name: "Nitoshu",
@@ -117,7 +114,6 @@ export default defineConfig(({ mode }) => {
           config: true,
         },
         workbox: {
-          // Required for PWA to find the inlined file
           globPatterns: ["**/*.{js,css,html,png,ico,json}"],
           runtimeCaching: [
             {
@@ -132,15 +128,24 @@ export default defineConfig(({ mode }) => {
             },
           ],
         },
-      }),
-      // Conditionally add the plugin
+      });
+
+  const build = {
+    sourcemap: !isSingleFile,
+    outDir: "./dist",
+    emptyOutDir: true,
+    chunkSizeWarningLimit: 1000,
+  };
+
+  return {
+    base: "./",
+    define: {
+      __IS_SINGLE_FILE__: JSON.stringify(isSingleFile),
+    },
+    plugins: [
+      !isSingleFile && pwaPlugin,
       isSingleFile && viteSingleFile(),
     ].filter(Boolean),
-    build: {
-      sourcemap: true,
-      outDir: "./dist",
-      emptyOutDir: true,
-      chunkSizeWarningLimit: 1000,
-    },
+    build,
   };
 });

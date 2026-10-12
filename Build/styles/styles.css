@@ -102,22 +102,39 @@ button:active {
 #editor {
   width: 100%;
   height: 100%;
-  border: none;
-  resize: none;
-  outline: none;
-  padding: 20px 30px;
-  box-sizing: border-box;
-  font-family: var(--font-editor);
-  font-size: 14px;
-  line-height: 1.6;
-  color: var(--text-color);
-  white-space: pre;
-  overflow-y: auto;
+  overflow: hidden;
   transition: background-color 0.1s;
 }
 
-#editor.drag-over {
+#editor.drag-over,
+#editor.drag-over .cm-editor {
   background-color: var(--drag-over-bg);
+}
+
+#editor .cm-editor {
+  height: 100%;
+  font-size: 14px;
+  color: var(--text-color);
+  background-color: var(--bg-color);
+}
+
+#editor .cm-editor.cm-focused {
+  outline: none;
+}
+
+#editor .cm-scroller {
+  font-family: var(--font-editor);
+  line-height: 1.6;
+}
+
+#editor .cm-content {
+  padding: 20px 30px;
+}
+
+#editor .cm-gutters {
+  background-color: var(--bg-color);
+  border-right: 1px solid #eaeaea;
+  color: #aaaaaa;
 }
 
 #status-bar {
