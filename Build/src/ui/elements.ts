@@ -12,6 +12,16 @@ export function getEditorElements(): EditorElements {
       "editor-container",
       (element): element is HTMLElement => element instanceof HTMLElement,
     ),
+    openButton: getElement(
+      "open-button",
+      (element): element is HTMLButtonElement =>
+        element instanceof HTMLButtonElement,
+    ),
+    saveButton: getElement(
+      "save-button",
+      (element): element is HTMLButtonElement =>
+        element instanceof HTMLButtonElement,
+    ),
     fileInput: getElement(
       "file-input",
       (element): element is HTMLInputElement =>

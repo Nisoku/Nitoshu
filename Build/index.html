@@ -8,8 +8,8 @@
   </head>
   <body>
     <div id="toolbar">
-      <button onclick="window.triggerLoad()">Open File</button>
-      <button onclick="window.saveFile()">Save File</button>
+      <button id="open-button" type="button">Open File</button>
+      <button id="save-button" type="button">Save File</button>
 
       <div class="filename-container">
         <input
@@ -22,7 +22,7 @@
       </div>
     </div>
 
-    <input type="file" id="file-input" onchange="window.loadFile(this)" />
+    <input type="file" id="file-input" />
 
     <div id="editor-container">
       <textarea

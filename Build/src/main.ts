@@ -1,18 +1,35 @@
+import { bindEvent, effect } from "@nisoku/sairin";
 import { createEditor } from "./editor";
 import type { EditorAdapter } from "./editor";
-import { appStore, DEFAULT_FILENAME } from "./state/app-state";
+import {
+  DEFAULT_FILENAME,
+  content,
+  flashStatus,
+  loadDocument,
+  markSaved,
+  setContent,
+  setStatus,
+} from "./state/app-state";
 import { registerFileHandlers } from "./files/file-handlers";
 import { readFileAsText } from "./files/reader";
 import { saveTextToFile } from "./files/saver";
 import { registerShortcuts } from "./shortcuts";
 import { getEditorElements } from "./ui/elements";
-import { StatusBar } from "./ui/status-bar";
+import { bindStatusBar } from "./ui/bindings";
 import { registerDragAndDrop } from "./ui/drag-drop";
 import type { EditorElements } from "./types";
 
 const elements: EditorElements = getEditorElements();
 const editor: EditorAdapter = createEditor(elements.editor);
-const statusBar = new StatusBar(elements.charCount, elements.saveStatus);
+
+bindStatusBar(elements);
+
+effect(() => {
+  const value = content.get();
+  if (editor.getValue() !== value) {
+    editor.setValue(value);
+  }
+});
 
 function triggerLoad(): void {
   elements.fileInput.click();
@@ -20,13 +37,11 @@ function triggerLoad(): void {
 
 async function openFile(file: File): Promise<void> {
   try {
-    const content = await readFileAsText(file);
-    editor.setValue(content);
-    elements.filenameInput.value = file.name;
-    appStore.set({ content, filename: file.name, dirty: false });
-    statusBar.setStatus(`Loaded: ${file.name}`);
+    const value = await readFileAsText(file);
+    loadDocument(value, file.name);
+    setStatus(`Loaded: ${file.name}`);
   } catch (error) {
-    statusBar.setStatus("Failed to open file");
+    setStatus("Failed to open file");
     console.error(error);
   }
 }
@@ -41,19 +56,27 @@ function loadFile(input: HTMLInputElement): void {
 }
 
 function saveFile(): void {
-  const filename = elements.filenameInput.value.trim() || DEFAULT_FILENAME;
-  saveTextToFile(editor.getValue(), filename);
-  appStore.set({ filename, dirty: false });
-  statusBar.flash("Saved to Downloads", "Ready");
+  const name = elements.filenameInput.value.trim() || DEFAULT_FILENAME;
+  saveTextToFile(editor.getValue(), name);
+  markSaved(name);
+  flashStatus("Saved to Downloads");
 }
 
-appStore.subscribe((state) => {
-  statusBar.setCharacterCount(state.content.length);
+bindEvent(elements.openButton, "click", () => {
+  triggerLoad();
+});
+
+bindEvent(elements.saveButton, "click", () => {
+  saveFile();
+});
+
+bindEvent(elements.fileInput, "change", () => {
+  loadFile(elements.fileInput);
 });
 
 editor.onChange((value) => {
-  appStore.set({ content: value, dirty: true });
-  statusBar.setStatus("Unsaved changes");
+  setContent(value);
+  setStatus("Unsaved changes");
 });
 
 registerDragAndDrop({

@@ -22,6 +22,7 @@
   },
   "homepage": "https://github.com/Nisoku/Nitoshu#readme",
   "dependencies": {
+    "@nisoku/sairin": "^0.1.2",
     "vite": "^8.3.3"
   },
   "devDependencies": {
