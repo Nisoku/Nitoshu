@@ -30,11 +30,19 @@ jobs:
 
       - name: Install dependencies
         working-directory: Build
-        run: npm i
+        run: npm ci
 
       - name: Build
         working-directory: Build
         run: npm run build
+
+      - name: Typecheck
+        working-directory: Build
+        run: npm run typecheck
+
+      - name: Test
+        working-directory: Build
+        run: npm test
 
       - name: Deploy browser build to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4

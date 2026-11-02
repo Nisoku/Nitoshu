@@ -27,7 +27,12 @@ Japanese is so cool :D
 - Clean, responsive UI (try it on mobile, too)
 - [PWA](https://web.dev/progressive-web-apps/) support (installable, offline-friendly)
 - Supports a huge array of text/code file extensions via the manifest
-- No dependencies except [Vite](https://vitejs.dev/) (for building) and minimal plugins
+- Multi-tab editing with undo history preserved per tab
+- Folder editing with rename, save, and supported file deletion
+- Image and PDF previews, with reload recovery for folder-opened files
+- Markdown and JSON language support with subtle JSON diagnostics
+- Command palette with practical text-editing commands
+- Written in strict TypeScript, with minimal runtime dependencies
 
 ---
 
@@ -53,8 +58,14 @@ Just open the latest [single-file](https://github.com/Nisoku/Nitoshu/actions/wor
 
 - Type, paste, or drag in a file.
 - Use <kbd>Open File</kbd> or drop a text/code file to edit.
+- Use <kbd>Folder</kbd> to edit files in place when the browser supports the File System Access API.
 - Use <kbd>Save File</kbd> or <kbd>Ctrl</kbd>/<kbd>Cmd</kbd>+<kbd>S</kbd> to save.
 - Edit the filename mid-session as you like!
+- Use the command palette (<kbd>Ctrl</kbd>/<kbd>Cmd</kbd>+<kbd>K</kbd>) for line and selection tools.
+
+On a fresh launch, Nitoshu opens to its calm home screen. Choose **New** to
+create `Untitled.txt`, or choose **Open**/**Folder** to begin with an existing
+file. Reloading restores open drafts when storage and file permissions allow it.
 
 ---
 
@@ -62,15 +73,29 @@ Just open the latest [single-file](https://github.com/Nisoku/Nitoshu/actions/wor
 
 - Install Nitoshu as a PWA ("Add to Home Screen"/"Install").
 - Open compatible text/code files directly via OS file handlers if your browser/platform supports it (check `vite.config.mjs` for all supported types, there's a LOT).
+- Browser permissions are required to save, rename, delete, or restore files opened from a folder. Files opened through the normal file picker are read-only from Nitoshu's perspective and save as downloads.
 
 ---
 
 ## Tech Stack
 
 - [Vite](https://vitejs.dev/) build tool
+- [TypeScript](https://www.typescriptlang.org/) (strict mode)
+- [CodeMirror 6](https://codemirror.net/) editor core
+- [`@nisoku/sairin`](https://nisoku.org/Sairin/) for reactive app/file/UI state
 - [vite-plugin-pwa](https://vite-pwa-org.netlify.app/)
 - [vite-plugin-singlefile](https://github.com/saf33r/vite-plugin-singlefile) (for a single, portable HTML build)
-- Zero external JS dependencies in the app code itself
+
+## Development checks
+
+From `Build/`:
+
+```bash
+npm run typecheck
+npm test
+npm run build
+npm run build:single
+```
 
 ---
 
