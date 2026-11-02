@@ -7,7 +7,10 @@ import {
   activeContent,
   activeDocumentId,
   activeFilename,
+  activeKind,
   activeLanguage,
+  createPreviewUrl,
+
   closeDocument,
   createDocument,
   documentSummaries,
@@ -15,6 +18,8 @@ import {
   markActiveSaved,
   openDocument,
   setActiveContent,
+  setActiveFilename,
+  setActiveSource,
 } from "./state/documents";
 import { flashStatus } from "./state/status";
 import {
@@ -32,8 +37,14 @@ import { applyTheme, resolvedTheme } from "./features/theme";
 import { registerFileHandlers } from "./files/file-handlers";
 import { readFileAsText } from "./files/reader";
 import { saveTextToFile, writeToFileHandle } from "./files/saver";
+import { classifyFile } from "./files/file-kind";
+import { renameFileHandle } from "./files/rename";
+import type { RenameResult } from "./files/rename";
+import { createHandleId, saveHandle } from "./storage/handles";
 import {
+  basename,
   openFolderFromPicker,
+  replaceBasename,
   supportsFileSystemAccess,
 } from "./files/workspace";
 import { registerCommandShortcuts } from "./shortcuts";
@@ -53,6 +64,7 @@ import { bindSettingsPanel } from "./ui/settings-panel";
 import { mountTabBar } from "./ui/tabs";
 import { mountToolbarIcons } from "./ui/icons";
 import { mountCommandPalette, buildCommands } from "./ui/command-palette";
+import { mountInlinePreview } from "./ui/preview";
 import { registerDragAndDrop } from "./ui/drag-drop";
 import type { EditorElements } from "./types";
 
@@ -80,6 +92,7 @@ async function bootstrap(): Promise<void> {
   bindStatusBar(elements);
   bindSettingsPanel(elements);
   mountTabBar(elements.tabsContainer);
+  mountInlinePreview(elements);
 
   const commandActions: Record<string, () => void> = {
     "new-file": () => {
@@ -102,6 +115,13 @@ async function bootstrap(): Promise<void> {
       const id = activeDocumentId.peek();
       if (id !== null) {
         closeDocument(id);
+      }
+      editor.focus();
+    },
+    "close-all-tabs": () => {
+      const summaries = documentSummaries.peek();
+      for (const doc of [...summaries].reverse()) {
+        closeDocument(doc.id);
       }
       editor.focus();
     },
@@ -146,10 +166,13 @@ async function bootstrap(): Promise<void> {
   effect(() => {
     const id = activeDocumentId.get();
     const value = activeContent.get();
+    const kind = activeKind.get();
     if (id !== lastDocumentId) {
       lastDocumentId = id;
-      editor.setDocument(value);
-    } else if (editor.getValue() !== value) {
+      if (kind === "text") {
+        editor.setDocument(value);
+      }
+    } else if (kind === "text" && editor.getValue() !== value) {
       editor.setValue(value);
     }
   });
@@ -190,6 +213,22 @@ async function bootstrap(): Promise<void> {
 
   async function openFile(file: File): Promise<void> {
     try {
+      const { kind } = await classifyFile(file);
+      if (kind === "image" || kind === "pdf") {
+        const url = createPreviewUrl(file, kind);
+        openDocument(file.name, "", null, kind, { kind, url });
+        flashStatus(`Previewing: ${file.name}`);
+        return;
+      }
+      if (kind !== "text") {
+        flashStatus(
+          kind === "too-large"
+            ? `Too large to open: ${file.name}`
+            : `Unsupported binary file: ${file.name}`,
+          4000,
+        );
+        return;
+      }
       const value = await readFileAsText(file);
       openDocument(file.name, value);
       recordRecent(file.name, value);
@@ -210,42 +249,86 @@ async function bootstrap(): Promise<void> {
   }
 
   async function openFolder(): Promise<void> {
-    if (supportsFileSystemAccess()) {
-      try {
-        const files = await openFolderFromPicker();
-        for (const file of files) {
-          openDocument(file.name, file.content, {
+    if (!supportsFileSystemAccess()) {
+      elements.folderInput.click();
+      return;
+    }
+    let files;
+    try {
+      files = await openFolderFromPicker();
+    } catch (error) {
+      if (error instanceof DOMException && error.name === "AbortError") {
+        return;
+      }
+      flashStatus("Failed to open folder", 4000);
+      console.error(error);
+      return;
+    }
+    let text = 0;
+    let preview = 0;
+    let skipped = 0;
+    for (const file of files) {
+      if (file.kind === "text") {
+        const handleId = createHandleId();
+        void saveHandle(handleId, file.handle);
+        openDocument(file.name, file.content, {
+          kind: "fs-access",
+          handle: file.handle,
+          relPath: file.relPath,
+          handleId,
+        });
+        text += 1;
+      } else if (file.kind === "image" || file.kind === "pdf") {
+        const handleId = createHandleId();
+        void saveHandle(handleId, file.handle);
+        const url = createPreviewUrl(file.file, file.kind);
+        openDocument(
+          file.name,
+          "",
+          {
             kind: "fs-access",
             handle: file.handle,
             relPath: file.relPath,
-          });
-        }
-        flashStatus(
-          `Opened folder: ${files.length} file${files.length === 1 ? "" : "s"}`,
+            handleId,
+          },
+          file.kind,
+          { kind: file.kind, url },
         );
-      } catch (error) {
-        if (error instanceof DOMException && error.name === "AbortError") {
-          return;
-        }
-        flashStatus("Failed to open folder", 4000);
-        console.error(error);
+        preview += 1;
+      } else {
+        skipped += 1;
       }
-      return;
     }
-    elements.folderInput.click();
+    flashStatus(
+      `Opened folder: ${text} text, ${preview} preview, ${skipped} skipped`,
+    );
   }
 
   async function openWebkitFolder(files: readonly File[]): Promise<void> {
     try {
+      let text = 0;
+      let preview = 0;
+      let skipped = 0;
       for (const file of files) {
-        const content = await readFileAsText(file);
-        openDocument(file.name, content, {
-          kind: "webkit",
-          relPath: file.webkitRelativePath || file.name,
-        });
+        const { kind } = await classifyFile(file);
+        const relPath = file.webkitRelativePath || file.name;
+        if (kind === "text") {
+          const content = await readFileAsText(file);
+          openDocument(file.name, content, { kind: "webkit", relPath });
+          text += 1;
+        } else if (kind === "image" || kind === "pdf") {
+          const url = createPreviewUrl(file, kind);
+          openDocument(file.name, "", { kind: "webkit", relPath }, kind, {
+            kind,
+            url,
+          });
+          preview += 1;
+        } else {
+          skipped += 1;
+        }
       }
       flashStatus(
-        `Opened folder: ${files.length} file${files.length === 1 ? "" : "s"}`,
+        `Opened folder: ${text} text, ${preview} preview, ${skipped} skipped`,
       );
     } catch (error) {
       flashStatus("Failed to open folder", 4000);
@@ -263,6 +346,10 @@ async function bootstrap(): Promise<void> {
   }
 
   async function saveFile(): Promise<void> {
+    if (activeKind.get() !== "text") {
+      flashStatus("Preview tabs can't be saved", 3000);
+      return;
+    }
     const name = elements.filenameInput.value.trim() || DEFAULT_FILENAME;
     const content = editor.getValue();
     const source = getActiveSource();
@@ -289,6 +376,52 @@ async function bootstrap(): Promise<void> {
     );
   }
 
+  async function commitRename(): Promise<void> {
+    const source = getActiveSource();
+    if (source?.kind !== "fs-access") {
+      return;
+    }
+    const oldName = basename(source.relPath);
+    const desired = elements.filenameInput.value.trim();
+    if (desired === "") {
+      setActiveFilename(oldName);
+      return;
+    }
+    if (desired === oldName) {
+      return;
+    }
+    if (desired.includes("/") || desired.includes("\\")) {
+      flashStatus("File names can't contain slashes", 3000);
+      setActiveFilename(oldName);
+      return;
+    }
+    let result: RenameResult;
+    try {
+      result = await renameFileHandle(source.handle, desired);
+    } catch (error) {
+      flashStatus(`Failed to rename: ${desired}`, 4000);
+      setActiveFilename(oldName);
+      console.error(error);
+      return;
+    }
+    if (result === "unsupported") {
+      flashStatus("Renaming on disk isn't supported here", 3500);
+      return;
+    }
+    if (result === "denied") {
+      flashStatus("Rename permission denied", 3000);
+      setActiveFilename(oldName);
+      return;
+    }
+    setActiveSource({
+      kind: "fs-access",
+      handle: source.handle,
+      relPath: replaceBasename(source.relPath, desired),
+      handleId: source.handleId,
+    });
+    flashStatus(`Renamed to ${desired}`);
+  }
+
   bindEvent(elements.openButton, "click", () => {
     triggerLoad();
   });
@@ -303,6 +436,10 @@ async function bootstrap(): Promise<void> {
 
   bindEvent(elements.fileInput, "change", () => {
     loadFile(elements.fileInput);
+  });
+
+  bindEvent(elements.filenameInput, "change", () => {
+    void commitRename();
   });
 
   bindEvent(elements.folderInput, "change", () => {
@@ -329,7 +466,10 @@ async function bootstrap(): Promise<void> {
   });
 
   document.addEventListener("keydown", (event) => {
-    if (event.key !== "Escape" || !zenMode.peek()) {
+    if (event.key !== "Escape") {
+      return;
+    }
+    if (!zenMode.peek()) {
       return;
     }
     if (

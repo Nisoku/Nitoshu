@@ -199,8 +199,12 @@ select:focus {
   display: flex;
   flex: 1;
   overflow-x: auto;
-  scrollbar-width: thin;
-  scrollbar-color: var(--button-border) transparent;
+  overflow-y: hidden;
+  scrollbar-width: none;
+}
+
+#tabs::-webkit-scrollbar {
+  display: none;
 }
 
 .tab {
@@ -226,6 +230,12 @@ select:focus {
 .tab-label {
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.tab-icon {
+  display: inline-flex;
+  align-items: center;
+  color: var(--muted);
 }
 
 .tab-dirty {
@@ -501,6 +511,9 @@ body.zen #zen-exit-button {
   position: fixed;
   inset: 0;
   z-index: 50;
+  position: fixed;
+  inset: 0;
+  z-index: 50;
   display: flex;
   align-items: flex-start;
   justify-content: center;
@@ -596,4 +609,50 @@ body.zen #zen-exit-button {
   padding: 12px;
   font-size: 13px;
   color: var(--muted);
+}
+
+#preview-inline {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: auto;
+  background: var(--status-bg);
+}
+
+#preview-inline[hidden] {
+  display: none;
+}
+
+#preview-inline .preview-image {
+  max-width: calc(100% - 32px);
+  max-height: calc(100% - 32px);
+  object-fit: contain;
+  box-shadow: var(--shadow);
+}
+
+#preview-inline .preview-frame {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: #ffffff;
+}
+
+.preview-pending {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+  color: var(--text-color);
+}
+
+.preview-pending p {
+  margin: 0;
+  font-size: 13px;
+}
+
+.preview-pending button {
+  height: var(--control-height);
 }

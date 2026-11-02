@@ -25,4 +25,5 @@ export interface EditorElements {
   readonly commandPalette: HTMLElement;
   readonly commandInput: HTMLInputElement;
   readonly commandList: HTMLElement;
+  readonly previewInline: HTMLElement;
 }

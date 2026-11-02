@@ -25,6 +25,15 @@ function renderTab(summary: DocumentSummary, activeId: string): HTMLElement {
     }
   });
 
+  if (summary.kind !== "text") {
+    const kindIcon = document.createElement("span");
+    kindIcon.className = "tab-icon";
+    kindIcon.append(
+      createIcon(summary.kind === "image" ? icons.image : icons.file, 14),
+    );
+    tab.append(kindIcon);
+  }
+
   const label = document.createElement("span");
   label.className = "tab-label";
   label.textContent = summary.filename;

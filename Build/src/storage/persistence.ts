@@ -37,7 +37,7 @@ export async function loadDocuments(): Promise<void> {
     null,
   );
   if (snapshot !== null && Array.isArray(snapshot.documents)) {
-    restoreDocuments(snapshot);
+    await restoreDocuments(snapshot);
   }
 }
 

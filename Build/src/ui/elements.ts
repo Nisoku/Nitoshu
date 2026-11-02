@@ -72,5 +72,6 @@ export function getEditorElements(): EditorElements {
         element instanceof HTMLInputElement,
     ),
     commandList: htmlElement("command-list"),
+    previewInline: htmlElement("preview-inline"),
   };
 }

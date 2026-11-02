@@ -1,5 +1,6 @@
 import {
   Download,
+  FileImage,
   FileText,
   FolderOpen,
   FolderTree,
@@ -25,6 +26,7 @@ export const icons = {
   zen: Maximize2,
   zenExit: Minimize2,
   file: FileText,
+  image: FileImage,
 } as const satisfies Record<string, IconNode>;
 
 export function createIcon(node: IconNode, size = 16): SVGSVGElement {
