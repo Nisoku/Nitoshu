@@ -11,7 +11,7 @@ import {
 
 export function bindSelectValue<T extends string>(
   select: HTMLSelectElement,
-  signal: Signal<T>,
+  signal: Signal<T>
 ): () => void {
   const disposeProperty = bindProperty(select, "value", signal);
   const disposeChange = bindEvent(select, "change", () => {
@@ -25,7 +25,7 @@ export function bindSelectValue<T extends string>(
 
 export function bindCheckboxValue(
   input: HTMLInputElement,
-  target: Signal<boolean>,
+  target: Signal<boolean>
 ): () => void {
   const disposeProperty = bindProperty(input, "checked", target);
   const disposeChange = bindEvent(input, "change", () => {
@@ -40,20 +40,20 @@ export function bindCheckboxValue(
 export function bindStatusBar(elements: EditorElements): () => void {
   const disposeCharCount = bindText(
     elements.charCount,
-    activeCharacterCountLabel,
+    activeCharacterCountLabel
   );
   const disposeStatus = bindText(elements.saveStatus, status);
   const disposeFilename = bindProperty(
     elements.filenameInput,
     "value",
-    activeFilename,
+    activeFilename
   );
   const disposeLanguage = bindProperty(
     elements.languageSelect,
     "value",
-    activeLanguage,
+    activeLanguage
   );
-  const onFilenameInput = bindEvent(elements.filenameInput, "input", (event) => {
+  const onFilenameInput = bindEvent(elements.filenameInput, "input", event => {
     const target = event.target;
     if (target instanceof HTMLInputElement) {
       setActiveFilename(target.value);
@@ -62,12 +62,12 @@ export function bindStatusBar(elements: EditorElements): () => void {
   const onLanguageChange = bindEvent(
     elements.languageSelect,
     "change",
-    (event) => {
+    event => {
       const target = event.target;
       if (target instanceof HTMLSelectElement) {
         setActiveLanguage(target.value);
       }
-    },
+    }
   );
 
   return () => {

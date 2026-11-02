@@ -18,9 +18,9 @@ export interface CommandDefinition {
 
 export function buildCommands(
   definitions: readonly CommandDefinition[],
-  actions: Readonly<Record<string, () => void>>,
+  actions: Readonly<Record<string, () => void>>
 ): Command[] {
-  return definitions.map((definition) => {
+  return definitions.map(definition => {
     const run = actions[definition.id];
     if (run === undefined) {
       throw new Error(`No runner registered for command "${definition.id}"`);
@@ -39,7 +39,7 @@ export function buildCommands(
 
 export function mountCommandPalette(
   elements: EditorElements,
-  commands: readonly Command[],
+  commands: readonly Command[]
 ): void {
   let filtered: Command[] = [...commands];
   let selectedIndex = 0;
@@ -82,7 +82,7 @@ export function mountCommandPalette(
           }
         });
         return item;
-      }),
+      })
     );
 
     const selected = elements.commandList.children[selectedIndex];
@@ -96,8 +96,8 @@ export function mountCommandPalette(
     filtered =
       normalized === ""
         ? [...commands]
-        : commands.filter((command) =>
-            command.label.toLowerCase().includes(normalized),
+        : commands.filter(command =>
+            command.label.toLowerCase().includes(normalized)
           );
     selectedIndex = 0;
     render();
@@ -110,9 +110,12 @@ export function mountCommandPalette(
 
   bindVisibility(elements.commandPalette, commandPaletteOpen);
 
-  bindEvent(elements.commandPalette, "click", (event) => {
+  bindEvent(elements.commandPalette, "click", event => {
     const target = event.target;
-    if (target instanceof Element && target.classList.contains("palette-backdrop")) {
+    if (
+      target instanceof Element &&
+      target.classList.contains("palette-backdrop")
+    ) {
       closeCommandPalette();
     }
   });
@@ -121,7 +124,7 @@ export function mountCommandPalette(
     filter(elements.commandInput.value);
   });
 
-  elements.commandInput.addEventListener("keydown", (event) => {
+  elements.commandInput.addEventListener("keydown", event => {
     switch (event.key) {
       case "ArrowDown":
         event.preventDefault();
@@ -133,7 +136,8 @@ export function mountCommandPalette(
       case "ArrowUp":
         event.preventDefault();
         if (filtered.length > 0) {
-          selectedIndex = (selectedIndex - 1 + filtered.length) % filtered.length;
+          selectedIndex =
+            (selectedIndex - 1 + filtered.length) % filtered.length;
           render();
         }
         break;

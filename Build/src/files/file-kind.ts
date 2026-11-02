@@ -51,7 +51,9 @@ async function readHead(file: Blob, length: number): Promise<Uint8Array> {
 
 async function detectBinaryType(file: Blob): Promise<Detected | undefined> {
   try {
-    return await fileTypeFromBuffer(await readHead(file, DETECTION_SAMPLE_BYTES));
+    return await fileTypeFromBuffer(
+      await readHead(file, DETECTION_SAMPLE_BYTES)
+    );
   } catch {
     return undefined;
   }
@@ -64,7 +66,11 @@ function looksBinary(bytes: Uint8Array): boolean {
       return true;
     }
     const isControl =
-      byte < 0x20 && byte !== 0x09 && byte !== 0x0a && byte !== 0x0c && byte !== 0x0d;
+      byte < 0x20 &&
+      byte !== 0x09 &&
+      byte !== 0x0a &&
+      byte !== 0x0c &&
+      byte !== 0x0d;
     if (isControl || byte === 0x7f) {
       suspicious += 1;
     }

@@ -3,14 +3,14 @@ export function registerFileHandlers(onFile: (file: File) => void): void {
     return;
   }
 
-  window.launchQueue.setConsumer((params) => {
+  window.launchQueue.setConsumer(params => {
     void handleLaunch(params, onFile);
   });
 }
 
 async function handleLaunch(
   params: LaunchParams,
-  onFile: (file: File) => void,
+  onFile: (file: File) => void
 ): Promise<void> {
   const handles = params.files ?? [];
   for (const handle of handles) {

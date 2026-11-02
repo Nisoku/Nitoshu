@@ -10,17 +10,17 @@ export function registerDragAndDrop(options: DragAndDropOptions): void {
     highlight.classList.toggle("drag-over", active);
   };
 
-  dropZone.addEventListener("dragover", (event) => {
+  dropZone.addEventListener("dragover", event => {
     event.preventDefault();
     setActive(true);
   });
 
-  dropZone.addEventListener("dragleave", (event) => {
+  dropZone.addEventListener("dragleave", event => {
     event.preventDefault();
     setActive(false);
   });
 
-  dropZone.addEventListener("drop", (event) => {
+  dropZone.addEventListener("drop", event => {
     event.preventDefault();
     setActive(false);
     const file = event.dataTransfer?.files[0];

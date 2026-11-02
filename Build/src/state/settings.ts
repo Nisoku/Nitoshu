@@ -17,17 +17,17 @@ export const DEFAULT_SETTINGS: Settings = {
 
 export const themeSetting = signal<ThemeSetting>(
   path("settings", "theme"),
-  DEFAULT_SETTINGS.theme,
+  DEFAULT_SETTINGS.theme
 );
 
 export const indentSetting = signal<IndentSetting>(
   path("settings", "indent"),
-  DEFAULT_SETTINGS.indent,
+  DEFAULT_SETTINGS.indent
 );
 
 export const wordWrapSetting = signal<boolean>(
   path("settings", "wordWrap"),
-  DEFAULT_SETTINGS.wordWrap,
+  DEFAULT_SETTINGS.wordWrap
 );
 
 export const settingsOpen = signal<boolean>(path("ui", "settingsOpen"), false);
@@ -39,12 +39,12 @@ export function setZenMode(value: boolean): void {
 }
 
 export function toggleZenMode(): void {
-  zenMode.update((zen) => !zen);
+  zenMode.update(zen => !zen);
 }
 
 export const commandPaletteOpen = signal<boolean>(
   path("ui", "commandPaletteOpen"),
-  false,
+  false
 );
 
 export function openCommandPalette(): void {
@@ -56,11 +56,11 @@ export function closeCommandPalette(): void {
 }
 
 export function toggleCommandPalette(): void {
-  commandPaletteOpen.update((open) => !open);
+  commandPaletteOpen.update(open => !open);
 }
 
 export function toggleSettings(): void {
-  settingsOpen.update((open) => !open);
+  settingsOpen.update(open => !open);
 }
 
 export function closeSettings(): void {

@@ -14,11 +14,11 @@ let initPromise: Promise<void> | null = null;
 function memoryBackend(): StorageBackend {
   const store = new Map<string, string>();
   return {
-    read: async (key) => store.get(key) ?? null,
+    read: async key => store.get(key) ?? null,
     write: async (key, value) => {
       store.set(key, value);
     },
-    remove: async (key) => {
+    remove: async key => {
       store.delete(key);
     },
   };
@@ -29,7 +29,7 @@ function opfsBackend(root: FileSystemDirectoryHandle): StorageBackend {
     return root.getFileHandle(PREFIX + key, { create });
   }
   return {
-    read: async (key) => {
+    read: async key => {
       try {
         const handle = await handleFor(key, false);
         const file = await handle.getFile();
@@ -47,7 +47,7 @@ function opfsBackend(root: FileSystemDirectoryHandle): StorageBackend {
         await writable.close();
       }
     },
-    remove: async (key) => {
+    remove: async key => {
       try {
         await root.removeEntry(PREFIX + key);
       } catch {
@@ -59,31 +59,31 @@ function opfsBackend(root: FileSystemDirectoryHandle): StorageBackend {
 
 function idbBackend(db: Promise<IDBDatabase>): StorageBackend {
   return {
-    read: async (key) => {
-      const value = await idbRequest(db, "readonly", (store) =>
-        store.get(key),
-      );
+    read: async key => {
+      const value = await idbRequest(db, "readonly", store => store.get(key));
       return value === undefined || value === null ? null : String(value);
     },
-    write: (key, value) => idbRequest(db, "readwrite", (store) => {
-      store.put(value, key);
-      return store.get(key);
-    }),
-    remove: (key) => idbRequest(db, "readwrite", (store) => {
-      store.delete(key);
-      return store.get(key);
-    }),
+    write: (key, value) =>
+      idbRequest(db, "readwrite", store => {
+        store.put(value, key);
+        return store.get(key);
+      }),
+    remove: key =>
+      idbRequest(db, "readwrite", store => {
+        store.delete(key);
+        return store.get(key);
+      }),
   };
 }
 
 function idbRequest<T>(
   dbPromise: Promise<IDBDatabase>,
   mode: IDBTransactionMode,
-  operation: (store: IDBObjectStore) => IDBRequest<unknown>,
+  operation: (store: IDBObjectStore) => IDBRequest<unknown>
 ): Promise<T> {
   return new Promise((resolve, reject) => {
     void dbPromise.then(
-      (db) => {
+      db => {
         const transaction = db.transaction(DB_STORE, mode);
         const store = transaction.objectStore(DB_STORE);
         const request = operation(store);
@@ -95,10 +95,12 @@ function idbRequest<T>(
         transaction.onerror = () =>
           reject(transaction.error ?? new Error("IndexedDB transaction"));
         transaction.onabort = () =>
-          reject(transaction.error ?? new Error("IndexedDB transaction aborted"));
+          reject(
+            transaction.error ?? new Error("IndexedDB transaction aborted")
+          );
         transaction.oncomplete = () => resolve(result);
       },
-      (error) => reject(error),
+      error => reject(error)
     );
   });
 }
@@ -147,7 +149,7 @@ async function detectBackend(): Promise<StorageBackend> {
 
 export function initStorage(): Promise<void> {
   if (initPromise === null) {
-    initPromise = detectBackend().then((next) => {
+    initPromise = detectBackend().then(next => {
       backend = next;
     });
   }
@@ -159,10 +161,7 @@ async function getBackend(): Promise<StorageBackend> {
   return backend ?? memoryBackend();
 }
 
-export async function readJson<T>(
-  key: string,
-  fallback: T,
-): Promise<T> {
+export async function readJson<T>(key: string, fallback: T): Promise<T> {
   try {
     const raw = await (await getBackend()).read(key);
     if (raw === null) {

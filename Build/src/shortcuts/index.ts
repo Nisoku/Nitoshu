@@ -44,11 +44,11 @@ export interface CommandBinding {
 
 export function registerCommandShortcuts(
   commands: readonly CommandBinding[],
-  actions: Readonly<Record<string, () => void>>,
+  actions: Readonly<Record<string, () => void>>
 ): void {
   document.addEventListener(
     "keydown",
-    (event) => {
+    event => {
       for (const command of commands) {
         const spec = command.shortcut;
         const action = actions[command.id];
@@ -64,6 +64,6 @@ export function registerCommandShortcuts(
         return;
       }
     },
-    true,
+    true
   );
 }

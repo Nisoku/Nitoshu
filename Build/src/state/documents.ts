@@ -14,7 +14,11 @@ export interface DocumentSummary {
 
 /** Serializable form of {@link DocumentSource}; handles live in IndexedDB. */
 export type StoredSource =
-  | { readonly kind: "fs-access"; readonly handleId: string; readonly relPath: string }
+  | {
+      readonly kind: "fs-access";
+      readonly handleId: string;
+      readonly relPath: string;
+    }
   | { readonly kind: "webkit"; readonly relPath: string };
 
 export interface StoredDocument {
@@ -48,10 +52,7 @@ export interface PreviewInfo {
   readonly url: string | null;
 }
 
-export function createPreviewUrl(
-  file: Blob,
-  kind: "image" | "pdf",
-): string {
+export function createPreviewUrl(file: Blob, kind: "image" | "pdf"): string {
   if (kind === "pdf" && file.type !== "application/pdf") {
     return URL.createObjectURL(new Blob([file], { type: "application/pdf" }));
   }
@@ -83,25 +84,27 @@ function getRecord(id: string): DocumentRecord {
       content: signal<string>(path("documents", id, "content"), ""),
       filename: signal<string>(
         path("documents", id, "filename"),
-        DEFAULT_FILENAME,
+        DEFAULT_FILENAME
       ),
       dirty: signal<boolean>(path("documents", id, "dirty"), false),
       language: signal<string>(path("documents", id, "language"), ""),
       source: signal<DocumentSource | null>(
         path("documents", id, "source"),
-        null,
+        null
       ),
       docKind: signal<DocumentKind>(path("documents", id, "kind"), "text"),
-      preview: signal<PreviewInfo | null>(path("documents", id, "preview"), null),
+      preview: signal<PreviewInfo | null>(
+        path("documents", id, "preview"),
+        null
+      ),
     };
     records.set(id, record);
   }
   return record;
 }
 
-export const activeDocumentId = derived(
-  path("documents", "activeIdView"),
-  () => activeId.get(),
+export const activeDocumentId = derived(path("documents", "activeIdView"), () =>
+  activeId.get()
 );
 
 export const activeContent = derived(path("documents", "activeContent"), () => {
@@ -114,7 +117,7 @@ export const activeFilename = derived(
   () => {
     const id = activeId.get();
     return id === "" ? DEFAULT_FILENAME : getRecord(id).filename.get();
-  },
+  }
 );
 
 export const activeDirty = derived(path("documents", "activeDirty"), () => {
@@ -127,30 +130,23 @@ export const activeLanguage = derived(
   () => {
     const id = activeId.get();
     return id === "" ? "" : getRecord(id).language.get();
-  },
+  }
 );
 
-export const activeKind = derived(
-  path("documents", "activeKind"),
-  () => {
-    const id = activeId.get();
-    return id === "" ? "text" : getRecord(id).docKind.get();
-  },
-);
+export const activeKind = derived(path("documents", "activeKind"), () => {
+  const id = activeId.get();
+  return id === "" ? "text" : getRecord(id).docKind.get();
+});
 
-export const activePreview = derived(
-  path("documents", "activePreview"),
-  () => {
-    const id = activeId.get();
-    return id === "" ? null : getRecord(id).preview.get();
-  },
-);
-
+export const activePreview = derived(path("documents", "activePreview"), () => {
+  const id = activeId.get();
+  return id === "" ? null : getRecord(id).preview.get();
+});
 
 export const documentSummaries = derived(
   path("documents", "summaries"),
   (): DocumentSummary[] =>
-    order.get().map((id) => {
+    order.get().map(id => {
       const record = getRecord(id);
       return {
         id,
@@ -158,17 +154,17 @@ export const documentSummaries = derived(
         dirty: record.dirty.get(),
         kind: record.docKind.get(),
       };
-    }),
+    })
 );
 
 export const activeCharacterCount = derived(
   path("documents", "activeCharacterCount"),
-  () => activeContent.get().length,
+  () => activeContent.get().length
 );
 
 export const activeCharacterCountLabel = derived(
   path("documents", "activeCharacterCountLabel"),
-  () => formatCharacterCount(activeCharacterCount.get()),
+  () => formatCharacterCount(activeCharacterCount.get())
 );
 
 function isReusable(id: string): boolean {
@@ -188,7 +184,7 @@ export function createDocument(
   content = "",
   source: DocumentSource | null = null,
   docKind: DocumentKind = "text",
-  preview: PreviewInfo | null = null,
+  preview: PreviewInfo | null = null
 ): string {
   const id = `doc-${++idCounter}`;
   const record = getRecord(id);
@@ -212,7 +208,7 @@ function loadInto(
   content: string,
   source: DocumentSource | null = null,
   docKind: DocumentKind = "text",
-  preview: PreviewInfo | null = null,
+  preview: PreviewInfo | null = null
 ): void {
   const record = getRecord(id);
   const previous = record.preview.peek();
@@ -232,7 +228,7 @@ function loadInto(
 
 function findDocumentId(
   filename: string,
-  source: DocumentSource | null,
+  source: DocumentSource | null
 ): string | null {
   const target = filename.trim();
   for (const id of order.get()) {
@@ -248,7 +244,8 @@ function findDocumentId(
       existingSource?.kind === "webkit" &&
       source.relPath === existingSource.relPath;
     const sameFilename =
-      source === null && existingSource === null &&
+      source === null &&
+      existingSource === null &&
       existing.filename.get().trim() === target;
     if (sameSource || sameWebkitSource || sameFilename) {
       return id;
@@ -262,7 +259,7 @@ export function openDocument(
   content: string,
   source: DocumentSource | null = null,
   docKind: DocumentKind = "text",
-  preview: PreviewInfo | null = null,
+  preview: PreviewInfo | null = null
 ): string {
   // Already open? Focus the existing tab instead of creating a duplicate.
   const existing = findDocumentId(filename, source);
@@ -298,12 +295,11 @@ export function closeDocument(id: string): void {
   if (index === -1) {
     return;
   }
-  const remaining = ids.filter((value) => value !== id);
+  const remaining = ids.filter(value => value !== id);
   batch(() => {
     order.set(remaining);
     if (activeId.get() === id) {
-      const fallback =
-        remaining[Math.min(index, remaining.length - 1)] ?? "";
+      const fallback = remaining[Math.min(index, remaining.length - 1)] ?? "";
       activeId.set(fallback);
     }
   });
@@ -416,7 +412,7 @@ function toStoredSource(source: DocumentSource | null): StoredSource | null {
 }
 
 async function resolveStoredSource(
-  source: StoredSource | null | undefined,
+  source: StoredSource | null | undefined
 ): Promise<DocumentSource | null> {
   if (source == null) {
     return null;
@@ -438,7 +434,7 @@ async function resolveStoredSource(
 
 async function hydratePreviewUrl(
   handle: FileSystemFileHandle,
-  kind: "image" | "pdf",
+  kind: "image" | "pdf"
 ): Promise<string | null> {
   try {
     const options: FileSystemHandlePermissionDescriptor = { mode: "read" };
@@ -483,7 +479,7 @@ export function snapshotDocuments(): DocumentsSnapshot {
 }
 
 export async function restoreDocuments(
-  snapshot: DocumentsSnapshot,
+  snapshot: DocumentsSnapshot
 ): Promise<void> {
   const stored = snapshot.documents;
   if (stored.length === 0) {
@@ -525,7 +521,7 @@ export async function restoreDocuments(
       record.docKind.set(kind);
       record.preview.set(kind === "text" ? null : { kind, url: null });
     }
-    order.set(pending.map((entry) => entry.id));
+    order.set(pending.map(entry => entry.id));
     activeId.set(mapped[snapshot.activeIndex] ?? first);
   });
 

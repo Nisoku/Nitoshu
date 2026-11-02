@@ -10,7 +10,6 @@ import {
   activeKind,
   activeLanguage,
   createPreviewUrl,
-
   closeDocument,
   createDocument,
   documentSummaries,
@@ -122,7 +121,7 @@ async function bootstrap(): Promise<void> {
     "close-all-tabs": () => {
       const summaries = documentSummaries.peek();
       if (
-        summaries.some((doc) => doc.dirty) &&
+        summaries.some(doc => doc.dirty) &&
         !window.confirm("Close all tabs with unsaved changes?")
       ) {
         return;
@@ -133,7 +132,7 @@ async function bootstrap(): Promise<void> {
       editor.focus();
     },
     "word-wrap": () => {
-      wordWrapSetting.update((enabled) => !enabled);
+      wordWrapSetting.update(enabled => !enabled);
     },
     zen: () => {
       toggleZenMode();
@@ -210,7 +209,7 @@ async function bootstrap(): Promise<void> {
   watchDocuments();
   watchRecent();
 
-  editor.onChange((value) => {
+  editor.onChange(value => {
     setActiveContent(value);
   });
 
@@ -232,7 +231,7 @@ async function bootstrap(): Promise<void> {
           kind === "too-large"
             ? `Too large to open: ${file.name}`
             : `Unsupported binary file: ${file.name}`,
-          4000,
+          4000
         );
         return;
       }
@@ -299,7 +298,7 @@ async function bootstrap(): Promise<void> {
             handleId,
           },
           file.kind,
-          { kind: file.kind, url },
+          { kind: file.kind, url }
         );
         preview += 1;
       } else {
@@ -307,7 +306,7 @@ async function bootstrap(): Promise<void> {
       }
     }
     flashStatus(
-      `Opened folder: ${text} text, ${preview} preview, ${skipped} skipped`,
+      `Opened folder: ${text} text, ${preview} preview, ${skipped} skipped`
     );
   }
 
@@ -339,7 +338,7 @@ async function bootstrap(): Promise<void> {
         `Opened folder: ${text} text, ${preview} preview, ${skipped} skipped` +
           (files.length > limitedFiles.length
             ? ` (${files.length - limitedFiles.length} not opened)`
-            : ""),
+            : "")
       );
     } catch (error) {
       flashStatus("Failed to open folder", 4000);
@@ -383,7 +382,7 @@ async function bootstrap(): Promise<void> {
     flashStatus(
       source?.kind === "webkit"
         ? "Saved to Downloads (folder is read-only)"
-        : "Saved to Downloads",
+        : "Saved to Downloads"
     );
   }
 
@@ -476,7 +475,7 @@ async function bootstrap(): Promise<void> {
     editor.focus();
   });
 
-  document.addEventListener("keydown", (event) => {
+  document.addEventListener("keydown", event => {
     if (event.key !== "Escape") {
       return;
     }
@@ -495,12 +494,12 @@ async function bootstrap(): Promise<void> {
   registerDragAndDrop({
     dropZone: document.body,
     highlight: elements.editor,
-    onFile: (file) => {
+    onFile: file => {
       void openFile(file);
     },
   });
 
-  registerFileHandlers((file) => {
+  registerFileHandlers(file => {
     void openFile(file);
   });
 

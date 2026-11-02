@@ -53,7 +53,7 @@ export interface LanguageOption {
 
 export function getLanguageOptions(): LanguageOption[] {
   return languages
-    .map((language) => ({ id: language.name, label: language.name }))
+    .map(language => ({ id: language.name, label: language.name }))
     .sort((a, b) => a.label.localeCompare(b.label));
 }
 
@@ -105,14 +105,14 @@ export class CodeMirrorEditor implements EditorAdapter {
       search({ top: true }),
       placeholder("Type here or drag and drop a file..."),
       this.languageCompartment.of(
-        this.currentSupport !== null ? [this.currentSupport] : [],
+        this.currentSupport !== null ? [this.currentSupport] : []
       ),
       this.themeCompartment.of(
-        this.currentTheme === "dark" ? darkEditorTheme : [],
+        this.currentTheme === "dark" ? darkEditorTheme : []
       ),
       this.indentCompartment.of(this.indentConfig(this.currentIndent)),
       this.wrapCompartment.of(
-        this.currentWordWrap ? EditorView.lineWrapping : [],
+        this.currentWordWrap ? EditorView.lineWrapping : []
       ),
       keymap.of([
         ...closeBracketsKeymap,
@@ -122,7 +122,7 @@ export class CodeMirrorEditor implements EditorAdapter {
         ...completionKeymap,
         indentWithTab,
       ]),
-      EditorView.updateListener.of((update) => {
+      EditorView.updateListener.of(update => {
         if (!update.docChanged || this.suppressChange) {
           return;
         }
@@ -169,20 +169,20 @@ export class CodeMirrorEditor implements EditorAdapter {
     try {
       if (saved === undefined) {
         this.view.setState(
-          EditorState.create({ doc: value, extensions: this.buildExtensions() }),
+          EditorState.create({ doc: value, extensions: this.buildExtensions() })
         );
       } else {
         this.view.setState(saved);
         this.view.dispatch({
           effects: [
             this.themeCompartment.reconfigure(
-              this.currentTheme === "dark" ? darkEditorTheme : [],
+              this.currentTheme === "dark" ? darkEditorTheme : []
             ),
             this.indentCompartment.reconfigure(
-              this.indentConfig(this.currentIndent),
+              this.indentConfig(this.currentIndent)
             ),
             this.wrapCompartment.reconfigure(
-              this.currentWordWrap ? EditorView.lineWrapping : [],
+              this.currentWordWrap ? EditorView.lineWrapping : []
             ),
           ],
         });
@@ -222,7 +222,7 @@ export class CodeMirrorEditor implements EditorAdapter {
     this.currentTheme = theme;
     this.view.dispatch({
       effects: this.themeCompartment.reconfigure(
-        theme === "dark" ? darkEditorTheme : [],
+        theme === "dark" ? darkEditorTheme : []
       ),
     });
   }
@@ -230,7 +230,7 @@ export class CodeMirrorEditor implements EditorAdapter {
   setIndent(indent: IndentSetting): void {
     this.currentIndent = indent;
     this.view.dispatch({
-      effects:       this.indentCompartment.reconfigure(this.indentConfig(indent)),
+      effects: this.indentCompartment.reconfigure(this.indentConfig(indent)),
     });
   }
 
@@ -241,14 +241,14 @@ export class CodeMirrorEditor implements EditorAdapter {
     this.currentWordWrap = enabled;
     this.view.dispatch({
       effects: this.wrapCompartment.reconfigure(
-        enabled ? EditorView.lineWrapping : [],
+        enabled ? EditorView.lineWrapping : []
       ),
     });
   }
 
   private async applyLanguage(
     filename: string,
-    languageId: string,
+    languageId: string
   ): Promise<void> {
     const token = ++this.languageToken;
     const description =
@@ -265,7 +265,7 @@ export class CodeMirrorEditor implements EditorAdapter {
           `Failed to load language support for ${
             languageId !== "" ? languageId : filename
           }`,
-          error,
+          error
         );
       }
     }
@@ -277,7 +277,7 @@ export class CodeMirrorEditor implements EditorAdapter {
     this.currentSupport = support;
     this.view.dispatch({
       effects: this.languageCompartment.reconfigure(
-        support !== null ? [support] : [],
+        support !== null ? [support] : []
       ),
     });
   }

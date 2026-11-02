@@ -1,18 +1,11 @@
 import { effect } from "@nisoku/sairin";
-import {
-  applySettings,
-  snapshotSettings,
-} from "../state/settings";
+import { applySettings, snapshotSettings } from "../state/settings";
 import {
   restoreDocuments,
   snapshotDocuments,
   type DocumentsSnapshot,
 } from "../state/documents";
-import {
-  restoreRecent,
-  recentFiles,
-  type RecentFile,
-} from "../state/recent";
+import { restoreRecent, recentFiles, type RecentFile } from "../state/recent";
 import {
   clearPersistenceFailure,
   reportPersistenceFailure,
@@ -41,10 +34,7 @@ export function watchSettings(): () => void {
 }
 
 export async function loadDocuments(): Promise<void> {
-  const snapshot = await readJson<unknown>(
-    DOCUMENTS_KEY,
-    null,
-  );
+  const snapshot = await readJson<unknown>(DOCUMENTS_KEY, null);
   if (isDocumentsSnapshot(snapshot)) {
     await restoreDocuments(snapshot);
   }
@@ -64,7 +54,7 @@ export function watchDocuments(): () => void {
         (error: unknown) => {
           reportPersistenceFailure();
           console.error("Failed to persist documents", error);
-        },
+        }
       );
     }, DOCUMENTS_DEBOUNCE_MS);
   });
@@ -74,7 +64,9 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
-function isStoredDocument(value: unknown): value is DocumentsSnapshot["documents"][number] {
+function isStoredDocument(
+  value: unknown
+): value is DocumentsSnapshot["documents"][number] {
   if (!isRecord(value)) {
     return false;
   }

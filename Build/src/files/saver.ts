@@ -16,7 +16,7 @@ export function saveTextToFile(content: string, filename: string): void {
 
 export async function writeToFileHandle(
   handle: FileSystemFileHandle,
-  content: string,
+  content: string
 ): Promise<void> {
   const writable = await handle.createWritable();
   try {

@@ -1,6 +1,10 @@
 import { bindEvent, effect } from "@nisoku/sairin";
 import type { EditorElements } from "../types";
-import { activeFilename, activePreview, requestActivePreview } from "../state/documents";
+import {
+  activeFilename,
+  activePreview,
+  requestActivePreview,
+} from "../state/documents";
 
 export function mountInlinePreview(elements: EditorElements): void {
   let renderedKey: string | null = null;
@@ -62,7 +66,7 @@ export function mountInlinePreview(elements: EditorElements): void {
     elements.editor.hidden = true;
   });
 
-  bindEvent(elements.previewInline, "click", (event) => {
+  bindEvent(elements.previewInline, "click", event => {
     if (event.target instanceof HTMLButtonElement) {
       void requestActivePreview();
     }
