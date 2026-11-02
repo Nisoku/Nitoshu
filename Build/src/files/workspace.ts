@@ -37,7 +37,7 @@ export async function openFolderFromPicker(): Promise<FolderFile[]> {
 }
 
 export async function readDirectory(
-  root: FileSystemDirectoryHandle
+  root: FileSystemDirectoryHandle,
 ): Promise<FolderFile[]> {
   const handles = await collectFileHandles(root, "");
   const files: FolderFile[] = [];
@@ -53,7 +53,7 @@ export async function readDirectory(
 
 async function toFolderFile(
   relPath: string,
-  handle: FileSystemFileHandle
+  handle: FileSystemFileHandle,
 ): Promise<FolderFile> {
   const name = basename(relPath);
   const file = await handle.getFile();
@@ -69,7 +69,7 @@ async function toFolderFile(
 
 async function collectFileHandles(
   dir: FileSystemDirectoryHandle,
-  prefix: string
+  prefix: string,
 ): Promise<Array<{ relPath: string; handle: FileSystemFileHandle }>> {
   const found: Array<{ relPath: string; handle: FileSystemFileHandle }> = [];
   for await (const [name, handle] of dir.entries()) {
@@ -83,7 +83,7 @@ async function collectFileHandles(
     }
     const nested = await collectFileHandles(
       handle as FileSystemDirectoryHandle,
-      relPath
+      relPath,
     );
     for (const file of nested) {
       if (found.length >= MAX_FOLDER_FILES) {

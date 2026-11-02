@@ -13,10 +13,17 @@ import {
   rectangularSelection,
 } from "@codemirror/view";
 import {
+  copyLineDown,
   defaultKeymap,
+  deleteLine,
   history,
   historyKeymap,
+  indentSelection,
   indentWithTab,
+  moveLineDown,
+  moveLineUp,
+  selectLine,
+  toggleComment,
 } from "@codemirror/commands";
 import {
   closeSearchPanel,
@@ -41,7 +48,10 @@ import {
   closeBracketsKeymap,
   completionKeymap,
 } from "@codemirror/autocomplete";
+import { json, jsonParseLinter } from "@codemirror/lang-json";
 import { languages } from "@codemirror/language-data";
+import { markdown } from "@codemirror/lang-markdown";
+import { lintGutter, lintKeymap, linter } from "@codemirror/lint";
 import type { IndentSetting } from "../state/settings";
 import type { EditorAdapter, EditorTheme } from "./adapter";
 import { darkEditorTheme } from "./theme";
@@ -53,7 +63,7 @@ export interface LanguageOption {
 
 export function getLanguageOptions(): LanguageOption[] {
   return languages
-    .map(language => ({ id: language.name, label: language.name }))
+    .map((language) => ({ id: language.name, label: language.name }))
     .sort((a, b) => a.label.localeCompare(b.label));
 }
 
@@ -65,6 +75,7 @@ export class CodeMirrorEditor implements EditorAdapter {
   private readonly themeCompartment = new Compartment();
   private readonly indentCompartment = new Compartment();
   private readonly wrapCompartment = new Compartment();
+  private readonly lintCompartment = new Compartment();
 
   private suppressChange = false;
   private languageToken = 0;
@@ -105,24 +116,26 @@ export class CodeMirrorEditor implements EditorAdapter {
       search({ top: true }),
       placeholder("Type here or drag and drop a file..."),
       this.languageCompartment.of(
-        this.currentSupport !== null ? [this.currentSupport] : []
+        this.currentSupport !== null ? [this.currentSupport] : [],
       ),
       this.themeCompartment.of(
-        this.currentTheme === "dark" ? darkEditorTheme : []
+        this.currentTheme === "dark" ? darkEditorTheme : [],
       ),
       this.indentCompartment.of(this.indentConfig(this.currentIndent)),
       this.wrapCompartment.of(
-        this.currentWordWrap ? EditorView.lineWrapping : []
+        this.currentWordWrap ? EditorView.lineWrapping : [],
       ),
+      this.lintCompartment.of([]),
       keymap.of([
         ...closeBracketsKeymap,
         ...defaultKeymap,
         ...searchKeymap,
         ...historyKeymap,
         ...completionKeymap,
+        ...lintKeymap,
         indentWithTab,
       ]),
-      EditorView.updateListener.of(update => {
+      EditorView.updateListener.of((update) => {
         if (!update.docChanged || this.suppressChange) {
           return;
         }
@@ -169,20 +182,23 @@ export class CodeMirrorEditor implements EditorAdapter {
     try {
       if (saved === undefined) {
         this.view.setState(
-          EditorState.create({ doc: value, extensions: this.buildExtensions() })
+          EditorState.create({
+            doc: value,
+            extensions: this.buildExtensions(),
+          }),
         );
       } else {
         this.view.setState(saved);
         this.view.dispatch({
           effects: [
             this.themeCompartment.reconfigure(
-              this.currentTheme === "dark" ? darkEditorTheme : []
+              this.currentTheme === "dark" ? darkEditorTheme : [],
             ),
             this.indentCompartment.reconfigure(
-              this.indentConfig(this.currentIndent)
+              this.indentConfig(this.currentIndent),
             ),
             this.wrapCompartment.reconfigure(
-              this.currentWordWrap ? EditorView.lineWrapping : []
+              this.currentWordWrap ? EditorView.lineWrapping : [],
             ),
           ],
         });
@@ -222,7 +238,7 @@ export class CodeMirrorEditor implements EditorAdapter {
     this.currentTheme = theme;
     this.view.dispatch({
       effects: this.themeCompartment.reconfigure(
-        theme === "dark" ? darkEditorTheme : []
+        theme === "dark" ? darkEditorTheme : [],
       ),
     });
   }
@@ -241,23 +257,57 @@ export class CodeMirrorEditor implements EditorAdapter {
     this.currentWordWrap = enabled;
     this.view.dispatch({
       effects: this.wrapCompartment.reconfigure(
-        enabled ? EditorView.lineWrapping : []
+        enabled ? EditorView.lineWrapping : [],
       ),
     });
   }
 
+  runTextCommand(
+    command:
+      | "duplicate-line"
+      | "move-line-up"
+      | "move-line-down"
+      | "delete-line"
+      | "select-line"
+      | "indent-selection"
+      | "toggle-comment",
+  ): void {
+    const commands = {
+      "duplicate-line": copyLineDown,
+      "move-line-up": moveLineUp,
+      "move-line-down": moveLineDown,
+      "delete-line": deleteLine,
+      "select-line": selectLine,
+      "indent-selection": indentSelection,
+      "toggle-comment": toggleComment,
+    } as const;
+    commands[command](this.view);
+  }
+
   private async applyLanguage(
     filename: string,
-    languageId: string
+    languageId: string,
   ): Promise<void> {
     const token = ++this.languageToken;
+    const normalizedFilename = filename.toLowerCase();
+    const isJson =
+      languageId.toLowerCase() === "json" ||
+      normalizedFilename.endsWith(".json");
+    const isMarkdown =
+      languageId.toLowerCase() === "markdown" ||
+      normalizedFilename.endsWith(".md") ||
+      normalizedFilename.endsWith(".markdown");
     const description =
       languageId !== ""
         ? LanguageDescription.matchLanguageName(languages, languageId, true)
         : LanguageDescription.matchFilename(languages, filename);
 
     let support: LanguageSupport | null = null;
-    if (description !== null) {
+    if (isJson) {
+      support = json();
+    } else if (isMarkdown) {
+      support = markdown();
+    } else if (description !== null) {
       try {
         support = await description.load();
       } catch (error) {
@@ -265,7 +315,7 @@ export class CodeMirrorEditor implements EditorAdapter {
           `Failed to load language support for ${
             languageId !== "" ? languageId : filename
           }`,
-          error
+          error,
         );
       }
     }
@@ -276,9 +326,12 @@ export class CodeMirrorEditor implements EditorAdapter {
 
     this.currentSupport = support;
     this.view.dispatch({
-      effects: this.languageCompartment.reconfigure(
-        support !== null ? [support] : []
-      ),
+      effects: [
+        this.languageCompartment.reconfigure(support !== null ? [support] : []),
+        this.lintCompartment.reconfigure(
+          isJson ? [lintGutter(), linter(jsonParseLinter())] : [],
+        ),
+      ],
     });
   }
 }

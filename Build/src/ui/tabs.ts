@@ -18,7 +18,7 @@ function renderTab(summary: DocumentSummary, activeId: string): HTMLElement {
   tab.addEventListener("click", () => {
     setActiveDocument(summary.id);
   });
-  tab.addEventListener("auxclick", event => {
+  tab.addEventListener("auxclick", (event) => {
     if (event.button === 1) {
       event.preventDefault();
       closeDocument(summary.id);
@@ -29,7 +29,7 @@ function renderTab(summary: DocumentSummary, activeId: string): HTMLElement {
     const kindIcon = document.createElement("span");
     kindIcon.className = "tab-icon";
     kindIcon.append(
-      createIcon(summary.kind === "image" ? icons.image : icons.file, 14)
+      createIcon(summary.kind === "image" ? icons.image : icons.file, 14),
     );
     tab.append(kindIcon);
   }
@@ -49,7 +49,7 @@ function renderTab(summary: DocumentSummary, activeId: string): HTMLElement {
   close.className = "tab-close";
   close.title = "Close";
   close.append(createIcon(icons.close, 14));
-  close.addEventListener("click", event => {
+  close.addEventListener("click", (event) => {
     event.stopPropagation();
     closeDocument(summary.id);
   });
@@ -63,7 +63,7 @@ export function mountTabBar(container: HTMLElement): () => void {
     const summaries = documentSummaries.get();
     const activeId = activeDocumentId.get();
     container.replaceChildren(
-      ...summaries.map(summary => renderTab(summary, activeId))
+      ...summaries.map((summary) => renderTab(summary, activeId)),
     );
   });
 }

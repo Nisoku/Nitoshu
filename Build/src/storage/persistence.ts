@@ -54,7 +54,7 @@ export function watchDocuments(): () => void {
         (error: unknown) => {
           reportPersistenceFailure();
           console.error("Failed to persist documents", error);
-        }
+        },
       );
     }, DOCUMENTS_DEBOUNCE_MS);
   });
@@ -65,7 +65,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 function isStoredDocument(
-  value: unknown
+  value: unknown,
 ): value is DocumentsSnapshot["documents"][number] {
   if (!isRecord(value)) {
     return false;

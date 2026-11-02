@@ -23,7 +23,7 @@
         <input
           type="text"
           id="filename-input"
-          value="Untitled.txt"
+          value="Nitoshu"
           spellcheck="false"
           title="Rename file here"
         />
@@ -66,10 +66,27 @@
     <div id="editor-container">
       <div id="editor"></div>
       <div id="preview-inline" hidden></div>
+      <div id="empty-state" hidden>
+        <div class="empty-state-content">
+          <h1>Nitoshu</h1>
+          <p>A simple place to write.</p>
+          <div class="empty-state-actions">
+            <button id="empty-new-button" type="button">New</button>
+            <button id="empty-open-button" type="button">Open</button>
+            <button id="empty-folder-button" type="button">Folder</button>
+          </div>
+          <span class="empty-state-hint"
+            >Ctrl/Cmd+N for a new file · Ctrl/Cmd+O to open</span
+          >
+        </div>
+      </div>
     </div>
 
     <div id="status-bar">
       <span id="char-count">0 characters</span>
+      <span id="document-info" title="Text encoding and line endings"
+        >UTF-8 · LF</span
+      >
       <span>
         <b>Nitoshu</b>
       </span>

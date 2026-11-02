@@ -24,7 +24,7 @@ function mountRecentList(elements: EditorElements): void {
       return;
     }
     elements.recentList.replaceChildren(
-      ...files.map(file => {
+      ...files.map((file) => {
         const button = document.createElement("button");
         button.type = "button";
         button.className = "recent-item";
@@ -39,7 +39,7 @@ function mountRecentList(elements: EditorElements): void {
           closeSettings();
         });
         return button;
-      })
+      }),
     );
   });
 }
@@ -51,16 +51,16 @@ export function bindSettingsPanel(elements: EditorElements): void {
   bindVisibility(elements.settingsPanel, settingsOpen);
   mountRecentList(elements);
 
-  bindEvent(elements.settingsButton, "click", event => {
+  bindEvent(elements.settingsButton, "click", (event) => {
     event.stopPropagation();
-    settingsOpen.update(open => !open);
+    settingsOpen.update((open) => !open);
   });
 
   bindEvent(elements.closeSettingsButton, "click", () => {
     closeSettings();
   });
 
-  document.addEventListener("click", event => {
+  document.addEventListener("click", (event) => {
     if (!settingsOpen.get()) {
       return;
     }

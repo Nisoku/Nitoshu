@@ -66,7 +66,7 @@ export function mountInlinePreview(elements: EditorElements): void {
     elements.editor.hidden = true;
   });
 
-  bindEvent(elements.previewInline, "click", event => {
+  bindEvent(elements.previewInline, "click", (event) => {
     if (event.target instanceof HTMLButtonElement) {
       void requestActivePreview();
     }

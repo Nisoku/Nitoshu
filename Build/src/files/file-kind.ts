@@ -52,7 +52,7 @@ async function readHead(file: Blob, length: number): Promise<Uint8Array> {
 async function detectBinaryType(file: Blob): Promise<Detected | undefined> {
   try {
     return await fileTypeFromBuffer(
-      await readHead(file, DETECTION_SAMPLE_BYTES)
+      await readHead(file, DETECTION_SAMPLE_BYTES),
     );
   } catch {
     return undefined;

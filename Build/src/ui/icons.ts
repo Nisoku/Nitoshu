@@ -53,4 +53,7 @@ export function mountToolbarIcons(elements: EditorElements): void {
   setIcon(elements.closeSettingsButton, icons.close);
   setIcon(elements.zenExitButton, icons.zenExit);
   setIcon(elements.newTabButton, icons.newTab);
+  elements.emptyNewButton.prepend(createIcon(icons.newTab));
+  elements.emptyOpenButton.prepend(createIcon(icons.open));
+  elements.emptyFolderButton.prepend(createIcon(icons.folder));
 }

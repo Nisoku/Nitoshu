@@ -295,6 +295,57 @@ select:focus {
   overflow: hidden;
 }
 
+#empty-state {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: var(--bg-color);
+  z-index: 2;
+}
+
+#empty-state[hidden] {
+  display: none;
+}
+
+.empty-state-content {
+  max-width: 360px;
+  padding: 24px;
+  text-align: center;
+  color: var(--muted);
+}
+
+.empty-state-content h1 {
+  margin: 0 0 6px;
+  color: var(--text-color);
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.empty-state-content p {
+  margin: 0 0 16px;
+  font-size: 13px;
+}
+
+.empty-state-actions {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.empty-state-actions button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.empty-state-hint {
+  display: block;
+  margin-top: 14px;
+  font-size: 12px;
+}
+
 #editor {
   width: 100%;
   height: 100%;
@@ -341,6 +392,47 @@ select:focus {
   display: flex;
   justify-content: space-between;
   background: var(--status-bg);
+}
+
+#document-info {
+  color: var(--muted);
+}
+
+button:focus-visible,
+select:focus-visible,
+input:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--accent) 35%, transparent);
+  outline-offset: 1px;
+}
+
+@media (max-width: 700px) {
+  #toolbar {
+    gap: 6px;
+    overflow-x: auto;
+    padding: 6px 8px;
+  }
+
+  #toolbar button,
+  #toolbar select {
+    flex: none;
+  }
+
+  #filename-input {
+    width: 140px;
+  }
+
+  #toolbar
+    button:not(#open-button):not(#save-button):not(#search-button):not(
+      #settings-button
+    ) {
+    font-size: 0;
+    width: 32px;
+    padding: 5px;
+  }
+
+  #toolbar button .icon {
+    margin: 0;
+  }
 }
 
 #file-input,

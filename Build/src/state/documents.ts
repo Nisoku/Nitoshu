@@ -84,18 +84,18 @@ function getRecord(id: string): DocumentRecord {
       content: signal<string>(path("documents", id, "content"), ""),
       filename: signal<string>(
         path("documents", id, "filename"),
-        DEFAULT_FILENAME
+        DEFAULT_FILENAME,
       ),
       dirty: signal<boolean>(path("documents", id, "dirty"), false),
       language: signal<string>(path("documents", id, "language"), ""),
       source: signal<DocumentSource | null>(
         path("documents", id, "source"),
-        null
+        null,
       ),
       docKind: signal<DocumentKind>(path("documents", id, "kind"), "text"),
       preview: signal<PreviewInfo | null>(
         path("documents", id, "preview"),
-        null
+        null,
       ),
     };
     records.set(id, record);
@@ -104,7 +104,7 @@ function getRecord(id: string): DocumentRecord {
 }
 
 export const activeDocumentId = derived(path("documents", "activeIdView"), () =>
-  activeId.get()
+  activeId.get(),
 );
 
 export const activeContent = derived(path("documents", "activeContent"), () => {
@@ -117,7 +117,11 @@ export const activeFilename = derived(
   () => {
     const id = activeId.get();
     return id === "" ? DEFAULT_FILENAME : getRecord(id).filename.get();
-  }
+  },
+);
+
+export const activeTitle = derived(path("documents", "activeTitle"), () =>
+  activeId.get() === "" ? "Nitoshu" : activeFilename.get(),
 );
 
 export const activeDirty = derived(path("documents", "activeDirty"), () => {
@@ -130,7 +134,7 @@ export const activeLanguage = derived(
   () => {
     const id = activeId.get();
     return id === "" ? "" : getRecord(id).language.get();
-  }
+  },
 );
 
 export const activeKind = derived(path("documents", "activeKind"), () => {
@@ -146,7 +150,7 @@ export const activePreview = derived(path("documents", "activePreview"), () => {
 export const documentSummaries = derived(
   path("documents", "summaries"),
   (): DocumentSummary[] =>
-    order.get().map(id => {
+    order.get().map((id) => {
       const record = getRecord(id);
       return {
         id,
@@ -154,17 +158,17 @@ export const documentSummaries = derived(
         dirty: record.dirty.get(),
         kind: record.docKind.get(),
       };
-    })
+    }),
 );
 
 export const activeCharacterCount = derived(
   path("documents", "activeCharacterCount"),
-  () => activeContent.get().length
+  () => activeContent.get().length,
 );
 
 export const activeCharacterCountLabel = derived(
   path("documents", "activeCharacterCountLabel"),
-  () => formatCharacterCount(activeCharacterCount.get())
+  () => formatCharacterCount(activeCharacterCount.get()),
 );
 
 function isReusable(id: string): boolean {
@@ -184,7 +188,7 @@ export function createDocument(
   content = "",
   source: DocumentSource | null = null,
   docKind: DocumentKind = "text",
-  preview: PreviewInfo | null = null
+  preview: PreviewInfo | null = null,
 ): string {
   const id = `doc-${++idCounter}`;
   const record = getRecord(id);
@@ -208,7 +212,7 @@ function loadInto(
   content: string,
   source: DocumentSource | null = null,
   docKind: DocumentKind = "text",
-  preview: PreviewInfo | null = null
+  preview: PreviewInfo | null = null,
 ): void {
   const record = getRecord(id);
   const previous = record.preview.peek();
@@ -228,7 +232,7 @@ function loadInto(
 
 function findDocumentId(
   filename: string,
-  source: DocumentSource | null
+  source: DocumentSource | null,
 ): string | null {
   const target = filename.trim();
   for (const id of order.get()) {
@@ -259,7 +263,7 @@ export function openDocument(
   content: string,
   source: DocumentSource | null = null,
   docKind: DocumentKind = "text",
-  preview: PreviewInfo | null = null
+  preview: PreviewInfo | null = null,
 ): string {
   // Already open? Focus the existing tab instead of creating a duplicate.
   const existing = findDocumentId(filename, source);
@@ -295,7 +299,7 @@ export function closeDocument(id: string): void {
   if (index === -1) {
     return;
   }
-  const remaining = ids.filter(value => value !== id);
+  const remaining = ids.filter((value) => value !== id);
   batch(() => {
     order.set(remaining);
     if (activeId.get() === id) {
@@ -412,7 +416,7 @@ function toStoredSource(source: DocumentSource | null): StoredSource | null {
 }
 
 async function resolveStoredSource(
-  source: StoredSource | null | undefined
+  source: StoredSource | null | undefined,
 ): Promise<DocumentSource | null> {
   if (source == null) {
     return null;
@@ -434,7 +438,7 @@ async function resolveStoredSource(
 
 async function hydratePreviewUrl(
   handle: FileSystemFileHandle,
-  kind: "image" | "pdf"
+  kind: "image" | "pdf",
 ): Promise<string | null> {
   try {
     const options: FileSystemHandlePermissionDescriptor = { mode: "read" };
@@ -479,7 +483,7 @@ export function snapshotDocuments(): DocumentsSnapshot {
 }
 
 export async function restoreDocuments(
-  snapshot: DocumentsSnapshot
+  snapshot: DocumentsSnapshot,
 ): Promise<void> {
   const stored = snapshot.documents;
   if (stored.length === 0) {
@@ -521,7 +525,7 @@ export async function restoreDocuments(
       record.docKind.set(kind);
       record.preview.set(kind === "text" ? null : { kind, url: null });
     }
-    order.set(pending.map(entry => entry.id));
+    order.set(pending.map((entry) => entry.id));
     activeId.set(mapped[snapshot.activeIndex] ?? first);
   });
 

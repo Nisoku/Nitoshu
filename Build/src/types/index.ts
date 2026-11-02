@@ -9,6 +9,7 @@ export interface EditorElements {
   readonly filenameInput: HTMLInputElement;
   readonly charCount: HTMLElement;
   readonly saveStatus: HTMLElement;
+  readonly documentInfo: HTMLElement;
   readonly tabsContainer: HTMLElement;
   readonly newTabButton: HTMLButtonElement;
   readonly languageSelect: HTMLSelectElement;
@@ -26,4 +27,8 @@ export interface EditorElements {
   readonly commandInput: HTMLInputElement;
   readonly commandList: HTMLElement;
   readonly previewInline: HTMLElement;
+  readonly emptyState: HTMLElement;
+  readonly emptyNewButton: HTMLButtonElement;
+  readonly emptyOpenButton: HTMLButtonElement;
+  readonly emptyFolderButton: HTMLButtonElement;
 }

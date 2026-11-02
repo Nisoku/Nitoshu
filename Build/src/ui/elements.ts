@@ -4,7 +4,7 @@ import { getElement } from "../utils/dom";
 function htmlElement(id: string): HTMLElement {
   return getElement(
     id,
-    (element): element is HTMLElement => element instanceof HTMLElement
+    (element): element is HTMLElement => element instanceof HTMLElement,
   );
 }
 
@@ -12,7 +12,7 @@ function button(id: string): HTMLButtonElement {
   return getElement(
     id,
     (element): element is HTMLButtonElement =>
-      element instanceof HTMLButtonElement
+      element instanceof HTMLButtonElement,
   );
 }
 
@@ -20,7 +20,7 @@ function select(id: string): HTMLSelectElement {
   return getElement(
     id,
     (element): element is HTMLSelectElement =>
-      element instanceof HTMLSelectElement
+      element instanceof HTMLSelectElement,
   );
 }
 
@@ -34,20 +34,21 @@ export function getEditorElements(): EditorElements {
     fileInput: getElement(
       "file-input",
       (element): element is HTMLInputElement =>
-        element instanceof HTMLInputElement
+        element instanceof HTMLInputElement,
     ),
     folderInput: getElement(
       "folder-input",
       (element): element is HTMLInputElement =>
-        element instanceof HTMLInputElement
+        element instanceof HTMLInputElement,
     ),
     filenameInput: getElement(
       "filename-input",
       (element): element is HTMLInputElement =>
-        element instanceof HTMLInputElement
+        element instanceof HTMLInputElement,
     ),
     charCount: htmlElement("char-count"),
     saveStatus: htmlElement("save-status"),
+    documentInfo: htmlElement("document-info"),
     tabsContainer: htmlElement("tabs"),
     newTabButton: button("new-tab-button"),
     languageSelect: select("language-select"),
@@ -60,7 +61,7 @@ export function getEditorElements(): EditorElements {
     wordWrapToggle: getElement(
       "word-wrap-toggle",
       (element): element is HTMLInputElement =>
-        element instanceof HTMLInputElement
+        element instanceof HTMLInputElement,
     ),
     recentList: htmlElement("recent-list"),
     zenButton: button("zen-button"),
@@ -69,9 +70,13 @@ export function getEditorElements(): EditorElements {
     commandInput: getElement(
       "command-input",
       (element): element is HTMLInputElement =>
-        element instanceof HTMLInputElement
+        element instanceof HTMLInputElement,
     ),
     commandList: htmlElement("command-list"),
     previewInline: htmlElement("preview-inline"),
+    emptyState: htmlElement("empty-state"),
+    emptyNewButton: button("empty-new-button"),
+    emptyOpenButton: button("empty-open-button"),
+    emptyFolderButton: button("empty-folder-button"),
   };
 }

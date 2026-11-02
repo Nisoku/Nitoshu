@@ -39,7 +39,7 @@ export const darkEditorTheme: Extension = [
       },
       "&.cm-focused .cm-selectionBackground": { backgroundColor: "#48484a" },
     },
-    { dark: true }
+    { dark: true },
   ),
   syntaxHighlighting(darkHighlightStyle),
 ];

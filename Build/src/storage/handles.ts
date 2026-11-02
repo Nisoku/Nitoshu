@@ -8,7 +8,7 @@ function openDb(): Promise<IDBDatabase | null> {
   if (dbPromise !== null) {
     return dbPromise;
   }
-  dbPromise = new Promise(resolve => {
+  dbPromise = new Promise((resolve) => {
     if (typeof indexedDB === "undefined") {
       resolve(null);
       return;
@@ -35,13 +35,13 @@ function openDb(): Promise<IDBDatabase | null> {
 
 function run<T>(
   mode: IDBTransactionMode,
-  operation: (store: IDBObjectStore) => IDBRequest
+  operation: (store: IDBObjectStore) => IDBRequest,
 ): Promise<T | null> {
-  return openDb().then(db => {
+  return openDb().then((db) => {
     if (db === null) {
       return null;
     }
-    return new Promise<T | null>(resolve => {
+    return new Promise<T | null>((resolve) => {
       let transaction: IDBTransaction;
       try {
         transaction = db.transaction(STORE, mode);
@@ -68,15 +68,15 @@ export function createHandleId(): string {
 
 export async function saveHandle(
   id: string,
-  handle: FileSystemHandle
+  handle: FileSystemHandle,
 ): Promise<void> {
-  await run<void>("readwrite", store => store.put(handle, id));
+  await run<void>("readwrite", (store) => store.put(handle, id));
 }
 
 export function loadHandle(id: string): Promise<FileSystemHandle | null> {
-  return run<FileSystemHandle>("readonly", store => store.get(id));
+  return run<FileSystemHandle>("readonly", (store) => store.get(id));
 }
 
 export async function removeHandle(id: string): Promise<void> {
-  await run<void>("readwrite", store => store.delete(id));
+  await run<void>("readwrite", (store) => store.delete(id));
 }

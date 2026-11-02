@@ -11,7 +11,9 @@ export const MAX_RECENT_FILES = 8;
 export const recentFiles = signal<RecentFile[]>(path("recent", "list"), []);
 
 export function recordRecent(filename: string, content: string): void {
-  const existing = recentFiles.get().filter(file => file.filename !== filename);
+  const existing = recentFiles
+    .get()
+    .filter((file) => file.filename !== filename);
   const next: RecentFile[] = [
     { filename, content, updatedAt: Date.now() },
     ...existing,
@@ -20,7 +22,9 @@ export function recordRecent(filename: string, content: string): void {
 }
 
 export function removeRecent(filename: string): void {
-  recentFiles.set(recentFiles.get().filter(file => file.filename !== filename));
+  recentFiles.set(
+    recentFiles.get().filter((file) => file.filename !== filename),
+  );
 }
 
 export function restoreRecent(files: readonly RecentFile[]): void {

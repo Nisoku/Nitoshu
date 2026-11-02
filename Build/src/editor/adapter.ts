@@ -16,4 +16,14 @@ export interface EditorAdapter {
   setTheme(theme: EditorTheme): void;
   setIndent(indent: IndentSetting): void;
   setWordWrap(enabled: boolean): void;
+  runTextCommand(
+    command:
+      | "duplicate-line"
+      | "move-line-up"
+      | "move-line-down"
+      | "delete-line"
+      | "select-line"
+      | "indent-selection"
+      | "toggle-comment",
+  ): void;
 }

@@ -84,15 +84,22 @@ async function bootstrap(): Promise<void> {
     elements.languageSelect.append(element);
   }
 
-  if (documentSummaries.peek().length === 0) {
-    createDocument();
-  }
-
   mountToolbarIcons(elements);
   bindStatusBar(elements);
   bindSettingsPanel(elements);
   mountTabBar(elements.tabsContainer);
   mountInlinePreview(elements);
+  const updateEmptyState = (): void => {
+    elements.emptyState.hidden = documentSummaries.get().length !== 0;
+  };
+  effect(updateEmptyState);
+  elements.emptyNewButton.addEventListener("click", () => {
+    createDocument();
+  });
+  elements.emptyOpenButton.addEventListener("click", triggerLoad);
+  elements.emptyFolderButton.addEventListener("click", () => {
+    void openFolder();
+  });
 
   const commandActions: Record<string, () => void> = {
     "new-file": () => {
@@ -111,6 +118,27 @@ async function bootstrap(): Promise<void> {
     find: () => {
       editor.toggleSearch();
     },
+    "duplicate-line": () => {
+      editor.runTextCommand("duplicate-line");
+    },
+    "move-line-up": () => {
+      editor.runTextCommand("move-line-up");
+    },
+    "move-line-down": () => {
+      editor.runTextCommand("move-line-down");
+    },
+    "delete-line": () => {
+      editor.runTextCommand("delete-line");
+    },
+    "select-line": () => {
+      editor.runTextCommand("select-line");
+    },
+    "indent-selection": () => {
+      editor.runTextCommand("indent-selection");
+    },
+    "toggle-comment": () => {
+      editor.runTextCommand("toggle-comment");
+    },
     "close-tab": () => {
       const id = activeDocumentId.peek();
       if (id !== null) {
@@ -121,7 +149,7 @@ async function bootstrap(): Promise<void> {
     "close-all-tabs": () => {
       const summaries = documentSummaries.peek();
       if (
-        summaries.some(doc => doc.dirty) &&
+        summaries.some((doc) => doc.dirty) &&
         !window.confirm("Close all tabs with unsaved changes?")
       ) {
         return;
@@ -132,7 +160,7 @@ async function bootstrap(): Promise<void> {
       editor.focus();
     },
     "word-wrap": () => {
-      wordWrapSetting.update(enabled => !enabled);
+      wordWrapSetting.update((enabled) => !enabled);
     },
     zen: () => {
       toggleZenMode();
@@ -196,6 +224,13 @@ async function bootstrap(): Promise<void> {
   });
 
   effect(() => {
+    const value = activeContent.get();
+    elements.documentInfo.textContent = `UTF-8 · ${
+      value.includes("\r\n") ? "CRLF" : "LF"
+    }`;
+  });
+
+  effect(() => {
     document.body.classList.toggle("zen", zenMode.get());
   });
 
@@ -209,7 +244,7 @@ async function bootstrap(): Promise<void> {
   watchDocuments();
   watchRecent();
 
-  editor.onChange(value => {
+  editor.onChange((value) => {
     setActiveContent(value);
   });
 
@@ -231,7 +266,7 @@ async function bootstrap(): Promise<void> {
           kind === "too-large"
             ? `Too large to open: ${file.name}`
             : `Unsupported binary file: ${file.name}`,
-          4000
+          4000,
         );
         return;
       }
@@ -298,7 +333,7 @@ async function bootstrap(): Promise<void> {
             handleId,
           },
           file.kind,
-          { kind: file.kind, url }
+          { kind: file.kind, url },
         );
         preview += 1;
       } else {
@@ -306,7 +341,7 @@ async function bootstrap(): Promise<void> {
       }
     }
     flashStatus(
-      `Opened folder: ${text} text, ${preview} preview, ${skipped} skipped`
+      `Opened folder: ${text} text, ${preview} preview, ${skipped} skipped`,
     );
   }
 
@@ -338,7 +373,7 @@ async function bootstrap(): Promise<void> {
         `Opened folder: ${text} text, ${preview} preview, ${skipped} skipped` +
           (files.length > limitedFiles.length
             ? ` (${files.length - limitedFiles.length} not opened)`
-            : "")
+            : ""),
       );
     } catch (error) {
       flashStatus("Failed to open folder", 4000);
@@ -382,7 +417,7 @@ async function bootstrap(): Promise<void> {
     flashStatus(
       source?.kind === "webkit"
         ? "Saved to Downloads (folder is read-only)"
-        : "Saved to Downloads"
+        : "Saved to Downloads",
     );
   }
 
@@ -475,7 +510,7 @@ async function bootstrap(): Promise<void> {
     editor.focus();
   });
 
-  document.addEventListener("keydown", event => {
+  document.addEventListener("keydown", (event) => {
     if (event.key !== "Escape") {
       return;
     }
@@ -494,12 +529,12 @@ async function bootstrap(): Promise<void> {
   registerDragAndDrop({
     dropZone: document.body,
     highlight: elements.editor,
-    onFile: file => {
+    onFile: (file) => {
       void openFile(file);
     },
   });
 
-  registerFileHandlers(file => {
+  registerFileHandlers((file) => {
     void openFile(file);
   });
 
