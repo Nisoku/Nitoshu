@@ -9,6 +9,7 @@
     "build": "vite build",
     "build:single": "cross-env SINGLE_FILE=true npm run build",
     "preview": "vite preview",
+    "make-pretty": "prettier --write . --ignore-path ../.gitignore",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -38,6 +39,7 @@
   "devDependencies": {
     "@vite-pwa/assets-generator": "^2.0.0",
     "cross-env": "^10.1.0",
+    "prettier": "^3.9.10",
     "sharp": "^0.35.5",
     "typescript": "^5.9.3",
     "vite-plugin-pwa": "^2.0.0",
