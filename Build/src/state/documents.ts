@@ -230,10 +230,27 @@ function loadInto(
   });
 }
 
-function findDocumentIdByFilename(filename: string): string | null {
+function findDocumentId(
+  filename: string,
+  source: DocumentSource | null,
+): string | null {
   const target = filename.trim();
   for (const id of order.get()) {
-    if (getRecord(id).filename.get().trim() === target) {
+    const existing = getRecord(id);
+    const existingSource = existing.source.get();
+    const sameSource =
+      source?.kind === "fs-access" &&
+      existingSource?.kind === "fs-access" &&
+      (source.handle === existingSource.handle ||
+        source.relPath === existingSource.relPath);
+    const sameWebkitSource =
+      source?.kind === "webkit" &&
+      existingSource?.kind === "webkit" &&
+      source.relPath === existingSource.relPath;
+    const sameFilename =
+      source === null && existingSource === null &&
+      existing.filename.get().trim() === target;
+    if (sameSource || sameWebkitSource || sameFilename) {
       return id;
     }
   }
@@ -248,7 +265,7 @@ export function openDocument(
   preview: PreviewInfo | null = null,
 ): string {
   // Already open? Focus the existing tab instead of creating a duplicate.
-  const existing = findDocumentIdByFilename(filename);
+  const existing = findDocumentId(filename, source);
   if (existing !== null) {
     if (isReusable(existing)) {
       loadInto(existing, filename, content, source, docKind, preview);

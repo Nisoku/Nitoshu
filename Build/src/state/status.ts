@@ -3,13 +3,19 @@ import { activeDirty } from "./documents";
 
 export const READY_STATUS = "Ready";
 export const UNSAVED_STATUS = "Unsaved changes";
+export const PERSISTENCE_ERROR_STATUS =
+  "Draft save failed; changes may not survive reload";
 
 const actionStatus = signal(path("ui", "actionStatus"), "");
+const persistenceError = signal(path("ui", "persistenceError"), false);
 
 export const status = derived(path("ui", "status"), () => {
   const action = actionStatus.get();
   if (action !== "") {
     return action;
+  }
+  if (persistenceError.get()) {
+    return PERSISTENCE_ERROR_STATUS;
   }
   return activeDirty.get() ? UNSAVED_STATUS : READY_STATUS;
 });
@@ -30,4 +36,12 @@ export function flashStatus(message: string, durationMs = 2000): void {
     statusResetTimer = undefined;
     actionStatus.set("");
   }, durationMs);
+}
+
+export function reportPersistenceFailure(): void {
+  persistenceError.set(true);
+}
+
+export function clearPersistenceFailure(): void {
+  persistenceError.set(false);
 }

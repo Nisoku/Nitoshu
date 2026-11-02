@@ -43,6 +43,7 @@ import type { RenameResult } from "./files/rename";
 import { createHandleId, saveHandle } from "./storage/handles";
 import {
   basename,
+  MAX_FOLDER_FILES,
   openFolderFromPicker,
   replaceBasename,
   supportsFileSystemAccess,
@@ -120,6 +121,12 @@ async function bootstrap(): Promise<void> {
     },
     "close-all-tabs": () => {
       const summaries = documentSummaries.peek();
+      if (
+        summaries.some((doc) => doc.dirty) &&
+        !window.confirm("Close all tabs with unsaved changes?")
+      ) {
+        return;
+      }
       for (const doc of [...summaries].reverse()) {
         closeDocument(doc.id);
       }
@@ -170,7 +177,7 @@ async function bootstrap(): Promise<void> {
     if (id !== lastDocumentId) {
       lastDocumentId = id;
       if (kind === "text") {
-        editor.setDocument(value);
+        editor.setDocument(id, value);
       }
     } else if (kind === "text" && editor.getValue() !== value) {
       editor.setValue(value);
@@ -309,7 +316,8 @@ async function bootstrap(): Promise<void> {
       let text = 0;
       let preview = 0;
       let skipped = 0;
-      for (const file of files) {
+      const limitedFiles = files.slice(0, MAX_FOLDER_FILES);
+      for (const file of limitedFiles) {
         const { kind } = await classifyFile(file);
         const relPath = file.webkitRelativePath || file.name;
         if (kind === "text") {
@@ -328,7 +336,10 @@ async function bootstrap(): Promise<void> {
         }
       }
       flashStatus(
-        `Opened folder: ${text} text, ${preview} preview, ${skipped} skipped`,
+        `Opened folder: ${text} text, ${preview} preview, ${skipped} skipped` +
+          (files.length > limitedFiles.length
+            ? ` (${files.length - limitedFiles.length} not opened)`
+            : ""),
       );
     } catch (error) {
       flashStatus("Failed to open folder", 4000);

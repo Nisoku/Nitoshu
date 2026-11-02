@@ -138,6 +138,9 @@ export function mountCommandPalette(
         }
         break;
       case "Enter": {
+        if (event.isComposing || event.keyCode === 229) {
+          break;
+        }
         event.preventDefault();
         const command = filtered[selectedIndex];
         if (command !== undefined) {

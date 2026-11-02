@@ -28,7 +28,7 @@ export type FolderFile =
   | PreviewFolderFile
   | SkippedFolderFile;
 
-const MAX_FOLDER_FILES = 200;
+export const MAX_FOLDER_FILES = 200;
 
 export function supportsFileSystemAccess(): boolean {
   return typeof window.showDirectoryPicker === "function";
@@ -43,9 +43,14 @@ export async function readDirectory(
   root: FileSystemDirectoryHandle,
 ): Promise<FolderFile[]> {
   const handles = await collectFileHandles(root, "");
-  const files = await Promise.all(
-    handles.map(({ relPath, handle }) => toFolderFile(relPath, handle)),
-  );
+  const files: FolderFile[] = [];
+  for (const { relPath, handle } of handles) {
+    try {
+      files.push(await toFolderFile(relPath, handle));
+    } catch (error) {
+      console.error(error);
+    }
+  }
   return files.sort((a, b) => a.relPath.localeCompare(b.relPath));
 }
 

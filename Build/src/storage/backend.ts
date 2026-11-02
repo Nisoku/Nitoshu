@@ -87,10 +87,16 @@ function idbRequest<T>(
         const transaction = db.transaction(DB_STORE, mode);
         const store = transaction.objectStore(DB_STORE);
         const request = operation(store);
-        request.onsuccess = () => resolve(request.result as T);
+        let result: T;
+        request.onsuccess = () => {
+          result = request.result as T;
+        };
         request.onerror = () => reject(request.error ?? new Error("IndexedDB"));
         transaction.onerror = () =>
           reject(transaction.error ?? new Error("IndexedDB transaction"));
+        transaction.onabort = () =>
+          reject(transaction.error ?? new Error("IndexedDB transaction aborted"));
+        transaction.oncomplete = () => resolve(result);
       },
       (error) => reject(error),
     );
@@ -169,11 +175,7 @@ export async function readJson<T>(
 }
 
 export async function writeJson(key: string, value: unknown): Promise<void> {
-  try {
-    await (await getBackend()).write(key, JSON.stringify(value));
-  } catch {
-    // Ignore storage failures (quota, disabled storage).
-  }
+  await (await getBackend()).write(key, JSON.stringify(value));
 }
 
 export async function removeKey(key: string): Promise<void> {

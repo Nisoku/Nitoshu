@@ -19,7 +19,7 @@ export function mountInlinePreview(elements: EditorElements): void {
       return;
     }
 
-    const key = preview.url ?? "pending";
+    const key = preview.url ?? `pending:${filename}`;
     if (key !== renderedKey) {
       elements.previewInline.replaceChildren();
       if (preview.url === null) {

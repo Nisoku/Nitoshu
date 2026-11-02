@@ -200,11 +200,6 @@ select:focus {
   flex: 1;
   overflow-x: auto;
   overflow-y: hidden;
-  scrollbar-width: none;
-}
-
-#tabs::-webkit-scrollbar {
-  display: none;
 }
 
 .tab {

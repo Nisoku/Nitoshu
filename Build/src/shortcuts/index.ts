@@ -25,11 +25,15 @@ export function shortcutLabel(spec: ShortcutSpec): string {
 
 function matchesShortcut(event: KeyboardEvent, spec: ShortcutSpec): boolean {
   const modPressed = event.ctrlKey || event.metaKey;
+  const keyMatches =
+    event.key.toLowerCase() === spec.key.toLowerCase() ||
+    (spec.key.length === 1 &&
+      event.code.toLowerCase() === `key${spec.key.toLowerCase()}`);
   return (
     modPressed === (spec.mod === true) &&
     event.shiftKey === (spec.shift === true) &&
     event.altKey === (spec.alt === true) &&
-    event.key.toLowerCase() === spec.key.toLowerCase()
+    keyMatches
   );
 }
 

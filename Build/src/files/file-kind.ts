@@ -28,6 +28,17 @@ const IMAGE_EXTENSIONS = new Set([
   "tif",
   "tiff",
 ]);
+const TEXT_BASED_TYPES = new Set([
+  "xml",
+  "rtf",
+  "ps",
+  "eps",
+  "vcf",
+  "vtt",
+  "stl",
+  "reg",
+  "ics",
+]);
 
 interface Detected {
   readonly ext: string;
@@ -81,7 +92,9 @@ export async function classifyFile(file: File): Promise<FileClassification> {
     if (detected.ext === "pdf") {
       return { kind: "pdf", mime: detected.mime, ext: detected.ext };
     }
-    return { kind: "binary", mime: detected.mime, ext: detected.ext };
+    if (!TEXT_BASED_TYPES.has(detected.ext)) {
+      return { kind: "binary", mime: detected.mime, ext: detected.ext };
+    }
   }
 
   // Fallback when the magic bytes are inconclusive: trust a known extension.

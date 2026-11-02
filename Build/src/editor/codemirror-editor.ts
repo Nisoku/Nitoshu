@@ -59,6 +59,7 @@ export function getLanguageOptions(): LanguageOption[] {
 
 export class CodeMirrorEditor implements EditorAdapter {
   private readonly view: EditorView;
+  private readonly documentStates = new Map<string, EditorState>();
   private readonly listeners = new Set<(value: string) => void>();
   private readonly languageCompartment = new Compartment();
   private readonly themeCompartment = new Compartment();
@@ -71,6 +72,7 @@ export class CodeMirrorEditor implements EditorAdapter {
   private currentTheme: EditorTheme = "light";
   private currentIndent: IndentSetting = "2";
   private currentWordWrap = false;
+  private currentDocumentId: string | null = null;
 
   constructor(container: HTMLElement) {
     this.view = new EditorView({
@@ -158,12 +160,34 @@ export class CodeMirrorEditor implements EditorAdapter {
     }
   }
 
-  setDocument(value: string): void {
+  setDocument(id: string, value: string): void {
+    if (this.currentDocumentId !== null) {
+      this.documentStates.set(this.currentDocumentId, this.view.state);
+    }
+    const saved = this.documentStates.get(id);
     this.suppressChange = true;
     try {
-      this.view.setState(
-        EditorState.create({ doc: value, extensions: this.buildExtensions() }),
-      );
+      if (saved === undefined) {
+        this.view.setState(
+          EditorState.create({ doc: value, extensions: this.buildExtensions() }),
+        );
+      } else {
+        this.view.setState(saved);
+        this.view.dispatch({
+          effects: [
+            this.themeCompartment.reconfigure(
+              this.currentTheme === "dark" ? darkEditorTheme : [],
+            ),
+            this.indentCompartment.reconfigure(
+              this.indentConfig(this.currentIndent),
+            ),
+            this.wrapCompartment.reconfigure(
+              this.currentWordWrap ? EditorView.lineWrapping : [],
+            ),
+          ],
+        });
+      }
+      this.currentDocumentId = id;
     } finally {
       this.suppressChange = false;
     }
