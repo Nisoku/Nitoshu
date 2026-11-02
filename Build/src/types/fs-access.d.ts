@@ -13,6 +13,7 @@ interface FileSystemHandle {
 
 interface FileSystemFileHandle {
   move?(newName: string): Promise<void>;
+  remove?(): Promise<void>;
 }
 
 interface FileSystemDirectoryHandle {

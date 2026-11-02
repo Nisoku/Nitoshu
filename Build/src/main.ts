@@ -37,8 +37,8 @@ import { registerFileHandlers } from "./files/file-handlers";
 import { readFileAsText } from "./files/reader";
 import { saveTextToFile, writeToFileHandle } from "./files/saver";
 import { classifyFile } from "./files/file-kind";
-import { renameFileHandle } from "./files/rename";
-import type { RenameResult } from "./files/rename";
+import { deleteFileHandle, renameFileHandle } from "./files/rename";
+import type { DeleteResult, RenameResult } from "./files/rename";
 import { createHandleId, saveHandle } from "./storage/handles";
 import {
   basename,
@@ -158,6 +158,9 @@ async function bootstrap(): Promise<void> {
         closeDocument(doc.id);
       }
       editor.focus();
+    },
+    "delete-file": () => {
+      void deleteActiveFile();
     },
     "word-wrap": () => {
       wordWrapSetting.update((enabled) => !enabled);
@@ -465,6 +468,38 @@ async function bootstrap(): Promise<void> {
       handleId: source.handleId,
     });
     flashStatus(`Renamed to ${desired}`);
+  }
+
+  async function deleteActiveFile(): Promise<void> {
+    const source = getActiveSource();
+    if (source?.kind !== "fs-access") {
+      flashStatus("Only files opened from a folder can be deleted", 3500);
+      return;
+    }
+    if (!window.confirm(`Delete ${source.relPath} permanently?`)) {
+      return;
+    }
+    let result: DeleteResult;
+    try {
+      result = await deleteFileHandle(source.handle);
+    } catch (error) {
+      flashStatus("Failed to delete file", 4000);
+      console.error(error);
+      return;
+    }
+    if (result === "unsupported") {
+      flashStatus("Deleting files isn't supported here", 3500);
+      return;
+    }
+    if (result === "denied") {
+      flashStatus("Delete permission denied", 3500);
+      return;
+    }
+    const id = activeDocumentId.peek();
+    if (id !== null) {
+      closeDocument(id);
+    }
+    flashStatus(`Deleted ${source.relPath}`);
   }
 
   bindEvent(elements.openButton, "click", () => {

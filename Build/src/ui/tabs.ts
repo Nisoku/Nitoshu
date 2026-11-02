@@ -11,6 +11,11 @@ import { createIcon, icons } from "./icons";
 function renderTab(summary: DocumentSummary, activeId: string): HTMLElement {
   const tab = document.createElement("div");
   tab.className = "tab";
+  tab.id = `tab-${summary.id}`;
+  tab.role = "tab";
+  tab.tabIndex = summary.id === activeId ? 0 : -1;
+  tab.setAttribute("aria-selected", String(summary.id === activeId));
+  tab.setAttribute("aria-label", summary.filename);
   tab.classList.toggle("active", summary.id === activeId);
   tab.classList.toggle("dirty", summary.dirty);
   tab.title = summary.filename;
@@ -24,6 +29,28 @@ function renderTab(summary: DocumentSummary, activeId: string): HTMLElement {
       closeDocument(summary.id);
     }
   });
+  tab.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      setActiveDocument(summary.id);
+      return;
+    }
+    if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") {
+      return;
+    }
+    const siblings = Array.from(
+      tab.parentElement?.querySelectorAll<HTMLElement>('[role="tab"]') ?? [],
+    );
+    const index = siblings.indexOf(tab);
+    const nextIndex =
+      (index + (event.key === "ArrowRight" ? 1 : -1) + siblings.length) %
+      siblings.length;
+    siblings[nextIndex]?.focus();
+    const nextId = summariesForTabNavigation(siblings[nextIndex]);
+    if (nextId !== undefined) {
+      setActiveDocument(nextId);
+    }
+  });
 
   if (summary.kind !== "text") {
     const kindIcon = document.createElement("span");
@@ -32,6 +59,12 @@ function renderTab(summary: DocumentSummary, activeId: string): HTMLElement {
       createIcon(summary.kind === "image" ? icons.image : icons.file, 14),
     );
     tab.append(kindIcon);
+  }
+
+  function summariesForTabNavigation(
+    tab: HTMLElement | undefined,
+  ): string | undefined {
+    return tab?.id.startsWith("tab-") ? tab.id.slice(4) : undefined;
   }
 
   const label = document.createElement("span");

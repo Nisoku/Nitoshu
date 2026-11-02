@@ -101,6 +101,10 @@
     "label": "Close All Tabs"
   },
   {
+    "id": "delete-file",
+    "label": "Delete File"
+  },
+  {
     "id": "word-wrap",
     "label": "Toggle Word Wrap"
   },
